@@ -5,11 +5,11 @@
 </template>
 
 <script>
-import { mapActions, mapMutations } from "vuex";
+import { mapActions } from "vuex";
 import subordinate from "~/components/form/subordinate.vue";
 
 export default {
-  middleware: ["pages/subdivisi"],
+  middleware: ["pages/subdivisi-detail"],
   async asyncData({ store, params }) {
     await Promise.all([
       store.dispatch("subordinate/getpengajuanID", params.id),
@@ -24,13 +24,11 @@ export default {
   components: {
     components: subordinate,
   },
-  mounted() {
-    },
+  mounted() {},
   methods: {
     ...mapActions("subordinate", ["getpengajuanID", "getstatus", "gethistory"]),
   },
 };
 </script>
 
-<style>
-</style>
+<style></style>

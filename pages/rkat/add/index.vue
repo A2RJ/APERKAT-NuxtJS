@@ -24,7 +24,7 @@ import rkatform from "~/components/form/rkat.vue";
 import { mapActions, mapState, mapMutations } from "vuex";
 
 export default {
-  middleware: ["pages/rkat"],
+  middleware: ["pages/rkat", "roles/sekniv"],
   async asyncData({ store, params }) {
     await Promise.all([store.dispatch("rkat/getUser")]);
     return;
@@ -32,8 +32,7 @@ export default {
   components: {
     "form-rkat": rkatform,
   },
-  mounted() {
-  },
+  mounted() {},
   methods: {
     ...mapMutations(["SET_IS_AUTH", "SET_RKAT_USER"]),
     ...mapActions("rkat", ["getUser"]),

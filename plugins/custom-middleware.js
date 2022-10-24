@@ -36,12 +36,11 @@ export default ({ app, route, store }, inject) => {
       : { status: "invalid" };
   });
 
-  inject("isSubDivisi", async () => {
+  inject("isHasAccess", async () => {
     if (!route.params && route.params.id) throw new Error("Id is required");
     const { data } = await app.$axios.get(
       `/pengajuan/checkIfHasAccess/${route.params.id}/${store.state.auth.user[0].id_user}`
     );
-
-    console.log(data);
+    return data;
   });
 };

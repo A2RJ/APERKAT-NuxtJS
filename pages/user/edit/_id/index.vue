@@ -19,14 +19,12 @@
 </template>
 
 <script>
-import { mapActions, mapState} from "vuex";
+import { mapActions, mapState } from "vuex";
 
 export default {
-  middleware: ["pages/user"],
+  middleware: ["pages/user", "roles/sekniv"],
   async asyncData({ store, params }) {
-    await Promise.all([
-      store.dispatch("user/getuserID", params.id),
-    ]);
+    await Promise.all([store.dispatch("user/getuserID", params.id)]);
     return;
   },
   methods: {
@@ -34,11 +32,10 @@ export default {
   },
   computed: {
     ...mapState("user", {
-      userID: (state) => state.userID
+      userID: (state) => state.userID,
     }),
   },
 };
 </script>
 
-<style>
-</style>
+<style></style>

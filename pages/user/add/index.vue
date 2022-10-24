@@ -19,12 +19,11 @@
 </template>
 
 <script>
-  export default {
-  middleware: ["pages/user"],
-  mounted(){},
-  methods:{}
+export default {
+  middleware: ["pages/user", "roles/sekniv"],
+  mounted() {},
+  methods: {},
 };
 </script>
 
-<style>
-</style>
+<style></style>
