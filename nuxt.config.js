@@ -1,5 +1,5 @@
-const url = process.env.IS_DEV ? process.env.DEV_URL : process.env.PROD_URL;
-
+// const url = process.env.IS_DEV ? process.env.DEV_URL : process.env.PROD_URL;
+const url = "https://aperkat.uts.ac.id/api";
 export default {
   ssr: true,
   target: "static",
