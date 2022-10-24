@@ -1,7 +1,7 @@
 export default async function ({ app, route, redirect }) {
-  const isAuthorized =
-    app.$isAuthorized("dirKeuangan") || app.$isAuthorized("prodi");
-
+  const keuangan = app.$isAuthorized("dirKeuangan");
+  const prodi = app.$isAuthorized("prodi");
+  const isAuthorized = keuangan || prodi;
   if (!isAuthorized) {
     return redirect("/");
   }

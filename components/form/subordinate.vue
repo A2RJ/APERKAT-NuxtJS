@@ -147,13 +147,25 @@
                 label-for="LPJKeuanganKegiatan"
               >
                 <b-form-file
+                  v-model="file1"
+                  :state="Boolean(file1)"
+                  placeholder="Choose a file or drop it here..."
+                  drop-placeholder="Drop file here..."
+                ></b-form-file>
+                <div class="mt-3">
+                  Selected file: {{ file1 ? file1.name : "" }}
+                </div>
+                <!-- <b-form-file
                   id="LPJKeuanganKegiatan"
                   v-model="LPJNewFormat"
                   :state="Boolean(LPJNewFormat)"
                   placeholder="Choose or drop it here..."
                   drop-placeholder="Drop file here..."
-                  accept=".pdf"
+                  accept=".pdf, .jpg, .png"
                 ></b-form-file>
+                <div class="mt-3">
+                  Selected file: {{ LPJNewFormat ? LPJNewFormat.name : "" }}
+                </div> -->
               </b-form-group>
               <button
                 class="btn btn-sm btn-outline-success float-right"
@@ -745,6 +757,8 @@ export default {
   },
   data() {
     return {
+      file1: null,
+      file2: null,
       form: {
         kode_rkat: null,
         id_user: this.$store.state.auth.user[0].id_user,
@@ -1345,11 +1359,11 @@ export default {
       });
     },
     async uploadLPJNewFormat() {
-      if (this.LPJNewFormat.length != 0) {
+      if (this.file1.length != 0) {
         const form = new FormData();
-        form.append("file", this.LPJNewFormat);
+        form.append("file", this.file1);
 
-        let status = this.checkFileSize(this.LPJNewFormat.size);
+        let status = this.checkFileSize(this.file1.size);
         if (status) {
           try {
             this.loader("Uploading...");

@@ -313,9 +313,6 @@ export const actions = {
         .then((response) => {
           commit("SET_AUTO_LPJ_KEGIATAN", response.data);
           resolve();
-        })
-        .catch((e) => {
-          commit("SET_AUTO_LPJ_KEGIATAN", e.response.data);
         });
     });
   },

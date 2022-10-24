@@ -3,58 +3,6 @@
     <div class="col-xl-12 col-lg-12 card-body">
       <b-tabs content-class="mt-3" v-if="userLogin == 120">
         <b-tab title="Belum Pencairan" active>
-          <custom-table
-            :items="listPencairan"
-            :fields="fieldsWR2TF"
-            :html="key"
-            :actions="actions"
-          >
-            <template v-slot:kode_rkat="row">
-              {{ row.item.kode_rkat }}
-            </template>
-            <template v-slot:rkat="row">
-              {{ row.item.nama_program }}
-            </template>
-            <template v-slot:biaya_program="row">
-              RP. {{ row.item.biaya_program | currency }}
-            </template>
-            <template v-slot:biaya_disetujui="row">
-              RP. {{ row.item.biaya_disetujui | currency }}
-            </template>
-            <template v-slot:pencairan="row">
-              <ul
-                v-for="pencairan in row.item.pencairan"
-                :key="pencairan.index"
-              >
-                <li>
-                  <a
-                    :href="
-                      'https://aperkat.uts.ac.id/api/public/file/' +
-                      pencairan.images
-                    "
-                    >Rp. {{ pencairan.nominal | currency }}</a
-                  >
-                </li>
-              </ul>
-            </template>
-            <template v-slot:actions="row">
-              <b-button
-                class="btn btn-sm my-1 mr-1"
-                variant="outline-warning"
-                v-b-modal.modal-1
-                @click="
-                  uploadPencairan(row.item.id_pengajuan, row.item.kode_rkat)
-                "
-                >Pencairan</b-button
-              >
-              <NuxtLink
-                class="btn btn-sm btn-outline-info"
-                :to="'/pengajuan/subordinate/edit/' + row.item.id_pengajuan"
-                :key="'edit' + row.index"
-                >Detail</NuxtLink
-              >
-            </template>
-          </custom-table>
           <!-- hide button modals -->
           <b-modal ref="modal" id="modal-1" :title="selectedRKAT" hide-footer>
             <div class="m-3">
@@ -116,6 +64,59 @@
               </div>
             </div>
           </b-modal>
+
+          <custom-table
+            :items="listPencairan"
+            :fields="fieldsWR2TF"
+            :html="key"
+            :actions="actions"
+          >
+            <template v-slot:kode_rkat="row">
+              {{ row.item.kode_rkat }}
+            </template>
+            <template v-slot:rkat="row">
+              {{ row.item.nama_program }}
+            </template>
+            <template v-slot:biaya_program="row">
+              RP. {{ row.item.biaya_program | currency }}
+            </template>
+            <template v-slot:biaya_disetujui="row">
+              RP. {{ row.item.biaya_disetujui | currency }}
+            </template>
+            <template v-slot:pencairan="row">
+              <ul
+                v-for="pencairan in row.item.pencairan"
+                :key="pencairan.index"
+              >
+                <li>
+                  <a
+                    :href="
+                      'https://aperkat.uts.ac.id/api/public/file/' +
+                      pencairan.images
+                    "
+                    >Rp. {{ pencairan.nominal | currency }}</a
+                  >
+                </li>
+              </ul>
+            </template>
+            <template v-slot:actions="row">
+              <b-button
+                class="btn btn-sm my-1 mr-1"
+                variant="outline-warning"
+                v-b-modal.modal-1
+                @click="
+                  uploadPencairan(row.item.id_pengajuan, row.item.kode_rkat)
+                "
+                >Pencairan</b-button
+              >
+              <NuxtLink
+                class="btn btn-sm btn-outline-info"
+                :to="'/pengajuan/supervisor/edit/' + row.item.id_pengajuan"
+                :key="'edit' + row.index"
+                >Detail</NuxtLink
+              >
+            </template>
+          </custom-table>
         </b-tab>
         <b-tab title="Sudah Pencairan">
           <custom-table
@@ -155,7 +156,7 @@
             <template v-slot:actions="row">
               <NuxtLink
                 class="btn btn-sm btn-outline-info"
-                :to="'/pengajuan/subordinate/edit/' + row.item.id_pengajuan"
+                :to="'/pengajuan/supervisor/edit/' + row.item.id_pengajuan"
                 :key="'edit' + row.index"
                 >Detail</NuxtLink
               >
@@ -212,7 +213,7 @@
             <template v-slot:actions="row">
               <NuxtLink
                 class="btn btn-sm btn-outline-info"
-                :to="'/pengajuan/subordinate/edit/' + row.item.id_pengajuan"
+                :to="'/pengajuan/supervisor/edit/' + row.item.id_pengajuan"
                 :key="'edit' + row.index"
                 >Detail</NuxtLink
               >
@@ -281,7 +282,7 @@
               >
               <NuxtLink
                 class="btn btn-sm btn-outline-info"
-                :to="'/pengajuan/subordinate/edit/' + row.item.id_pengajuan"
+                :to="'/pengajuan/supervisor/edit/' + row.item.id_pengajuan"
                 :key="'edit' + row.index"
                 >Detail</NuxtLink
               >
@@ -336,7 +337,7 @@
             <template v-slot:actions="row">
               <NuxtLink
                 class="btn btn-sm btn-outline-info"
-                :to="'/pengajuan/subordinate/edit/' + row.item.id_pengajuan"
+                :to="'/pengajuan/supervisor/edit/' + row.item.id_pengajuan"
                 :key="'edit' + row.index"
                 >Detail</NuxtLink
               >
@@ -348,7 +349,7 @@
   </div>
 </template>
 <script>
-import { mapActions, mapState } from "vuex";
+import { mapActions } from "vuex";
 
 export default {
   async asyncData({ store }) {
@@ -501,7 +502,7 @@ export default {
               this.failed("Upload ulang file");
             }
           } catch (e) {
-            console.log("Whoops Server Error");
+            this.failed("Whoops Server Error");
           }
         }
       } else {
@@ -558,6 +559,7 @@ export default {
     uploadPencairan(params, koderkat) {
       this.selectedRKAT = koderkat;
       this.selectedID = params;
+      console.log(this.selectedRKAT, this.selectedID);
     },
     async aprroveLPJKeuangan(params) {
       this.$swal({

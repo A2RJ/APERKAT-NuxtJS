@@ -28,19 +28,25 @@ export default ({ app, route, store }, inject) => {
   inject("isYourSubmission", async () => {
     if (!route.params && route.params.id) throw new Error("Id is required");
     const { data } = await app.$axios.get(`/pengajuan/${route.params.id}`);
-    if (!data.data) return { status: "invalid" };
+    if (!data.data) return false;
     const { id_user: pengajuanIdUser } = data.data;
-
-    return pengajuanIdUser === store.state.auth.user[0].id_user
-      ? { status: "valid" }
-      : { status: "invalid" };
+    return pengajuanIdUser === store.state.auth.user[0].id_user ? true : false;
   });
 
-  inject("isHasAccess", async () => {
-    if (!route.params && route.params.id) throw new Error("Id is required");
-    const { data } = await app.$axios.get(
-      `/pengajuan/checkIfHasAccess/${route.params.id}/${store.state.auth.user[0].id_user}`
-    );
-    return data;
+  inject("isHasAccess", async (id = null) => {
+    if (!id) throw new Error("Id is required");
+    const user = app.$user();
+    if (
+      user.role === "rektor" ||
+      user.role === "sekniv" ||
+      user.role === "warek2" ||
+      user.role === "dirKeuangan"
+    ) {
+      return true;
+    } else {
+      const url = `/pengajuan/checkIfHasAccess/${id}/${user.id_user}`;
+      const { data } = await app.$axios.get(url);
+      return data;
+    }
   });
 };

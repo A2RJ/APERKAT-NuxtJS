@@ -1,7 +1,11 @@
 <template lang="">
   <div class="row card shadow mb-4">
-    <div>
+    <div class="pl-3 pt-3 text-info">
       <!-- <p @click="download()" class="mt-3 mb-0 mr-3 float-right btn btn-outline-primary">Export Data</p> -->
+     <p>
+      Jumlah pencairan: {{ summary.pencairan }} <br>
+      Jumlah LPJ Keuangan: {{ summary.lpj_keuangan }}<br>
+      Jumlah LPJ kegiatan : {{ summary.lpj_kegiatan }}</p>
     </div>
     <div class="col-xl-12 col-lg-12 card-body">
       <b-table
@@ -63,6 +67,7 @@ export default {
   middleware: ["pages/pengajuan"],
   data() {
     return {
+      summary: [],
       data: [],
       fields: [
         {
@@ -121,7 +126,16 @@ export default {
       this.$axios
         .get("/pengajuan/summaryByUser/" + this.$route.params.id)
         .then((response) => {
-          this.data = response.data.data;
+          const res = response.data.data
+          this.data = res;
+          const pencairan = res.filter((item) => item.pencairan)
+          const lpj_keuangan = res.filter((item) => item.lpj_keuangan)
+          const lpj_kegiatan = res.filter((item) => item.lpj_kegiatan)
+          this.summary = {
+            pencairan: pencairan.length,
+            lpj_keuangan: lpj_keuangan.length,
+            lpj_kegiatan: lpj_kegiatan.length
+          }
         })
         .catch((error) => {
           alert(error);
