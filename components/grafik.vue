@@ -237,6 +237,7 @@ export default {
       fields: [
         { key: "fullname", label: "User" },
         { key: "nama_struktur", label: "Pelaksana" },
+        { key: "nama_program", label: "Nama Program" },
         { key: "kode_rkat", label: "Kode RKAT" },
         { key: "rencana_anggaran", label: "Total Anggaran" },
         { key: "biaya_program", label: "Total Realisasi" },

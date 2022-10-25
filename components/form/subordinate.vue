@@ -205,6 +205,31 @@
     </div>
 
     <div
+      class="col-xl-12 col-lg-12"
+      v-if="this.$route.name == 'pengajuan-subordinate-add'"
+    >
+      <div class="card mb-4">
+        <div class="card-header py-3">
+          <h6 class="m-0 font-weight-bold text-primary">Referensi</h6>
+        </div>
+        <div class="card-body">
+          <b-button
+            class="btn btn-sm my-2 mr-2"
+            variant="outline-success"
+            @click="downloadFile()"
+            >Download Template RAB
+          </b-button>
+          <b-button
+            class="btn btn-sm my-2 mr-2"
+            variant="outline-success"
+            @click="satuanHarga()"
+            >Referensi Satuan Harga
+          </b-button>
+        </div>
+      </div>
+    </div>
+
+    <div
       :class="
         this.$route.params.id ? 'col-xl-8 col-lg-7' : 'col-xl-12 col-lg-12'
       "
@@ -568,6 +593,17 @@
             :class="{ 'form-group--error': $v.file.$error }"
           >
             <!-- v-model="file" -->
+            <b-button
+              variant="outline-success btn-sm mr-2"
+              @click="toggleUploadRAB()"
+              >Upload file RAB</b-button
+            >
+            <b-button variant="outline-success btn-sm" @click="toggleInputRAB()"
+              >Input RAB manual</b-button
+            >
+          </b-form-group>
+
+          <div v-if="uploadRAB" class="mb-5">
             <b-form-file
               id="rab"
               v-model.trim="$v.file.$model"
@@ -587,20 +623,16 @@
                 >RAB
               </a>
             </div>
-            <b-button class="btn btn-sm my-2 mr-2" @click="downloadFile()"
-              >Download Template RAB
-            </b-button>
-            <b-button class="btn btn-sm my-2 mr-2" @click="satuanHarga()"
-              >Referensi Satuan Harga
-            </b-button>
             <b-button
-              variant="success"
+              variant="outline-success"
               class="btn btn-sm float-right my-2"
               @click="upload()"
               >Upload
             </b-button>
-          </b-form-group>
+          </div>
+
           <b-table
+            v-if="inputRAB"
             striped
             small
             responsive
@@ -610,44 +642,55 @@
             v-show="button"
           >
             <template #cell(jenis_barang)>
-              <input
-                v-model="nama_barang"
-                type="text"
-                name="nama_barang"
+              <b-form-textarea
                 id="nama_barang"
+                v-model="nama_barang"
+                max-rows="8"
                 required
-              />
+              ></b-form-textarea>
             </template>
             <template #cell(harga_satuan)>
-              <input
-                v-model="harga_satuan"
+              <b-form-textarea
                 @keyup="numberFormatHargaSatuan"
-                type="text"
-                name="satuan"
                 id="satuan"
+                v-model="harga_satuan"
+                max-rows="8"
                 required
-              />
+              ></b-form-textarea>
             </template>
             <template #cell(qty)>
-              <input v-model="qty" type="number" name="qty" id="qty" required />
+              <b-form-textarea
+                id="qty"
+                v-model="qty"
+                max-rows="8"
+                required
+              ></b-form-textarea>
             </template>
             <template #cell(total)>
               {{ (qty * harga_satuan.replaceAll(".", "")) | currency }}
             </template>
             <template #cell(keterangan)>
-              <input v-model="ket" type="text" name="qty" id="qty" required />
+              <b-form-textarea
+                id="qty"
+                v-model="ket"
+                max-rows="8"
+                placeholder="Opsional"
+                required
+              ></b-form-textarea>
             </template>
             <template #cell(action)>
               <button
                 type="button"
-                class="btn btn-sm btn-success"
+                class="btn btn-sm btn-outline-success"
                 @click="addRAB()"
               >
-                OK
+                Tambah
               </button>
             </template>
           </b-table>
+
           <b-table
+            v-if="items.length > 0"
             striped
             small
             responsive
@@ -664,14 +707,15 @@
             <template #cell(action)="data">
               <button
                 type="button"
-                class="btn btn-sm btn-danger"
+                class="btn btn-sm btn-outline-danger"
                 v-show="button"
                 @click="hapus(data.item.no)"
               >
-                X
+                Hapus
               </button>
             </template>
           </b-table>
+
           <button
             class="btn btn-sm btn-primary float-right"
             v-show="button"
@@ -860,6 +904,8 @@ export default {
       ],
       listData: [],
       total: 0,
+      uploadRAB: false,
+      inputRAB: false,
     };
   },
   validations: {
@@ -1126,6 +1172,14 @@ export default {
       this.$axios.get(`iku/child2ByID/${params2}`).then((res) => {
         this.id_iku_child2 = res.data.data.label;
       });
+    },
+    toggleInputRAB() {
+      if (this.uploadRAB) this.uploadRAB = false;
+      this.inputRAB = !this.inputRAB;
+    },
+    toggleUploadRAB() {
+      if (this.inputRAB) this.inputRAB = false;
+      this.uploadRAB = !this.uploadRAB;
     },
     async submit() {
       this.$v.$touch();
@@ -1608,6 +1662,10 @@ export default {
           keterangan: keterangan,
         });
         this.sum();
+        this.nama_barang = "";
+        this.harga_satuan = "";
+        this.qty = "";
+        this.ket = "";
       }
     },
     addRAB() {
@@ -1621,10 +1679,6 @@ export default {
         ),
         keterangan: this.ket,
       });
-      (this.nama_barang = ""),
-        (this.harga_satuan = ""),
-        (this.qty = ""),
-        (this.ket = "");
     },
     hapus(params) {
       let data = this.items.filter((i) => i.no !== params);

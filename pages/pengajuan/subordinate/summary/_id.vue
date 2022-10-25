@@ -1,11 +1,37 @@
 <template lang="">
   <div class="row card shadow mb-4">
-    <div class="pl-3 pt-3 text-info">
+    <div class="pl-3 pt-3 text-info row">
       <!-- <p @click="download()" class="mt-3 mb-0 mr-3 float-right btn btn-outline-primary">Export Data</p> -->
-     <p>
-      Jumlah pencairan: {{ summary.pencairan }} <br>
-      Jumlah LPJ Keuangan: {{ summary.lpj_keuangan }}<br>
-      Jumlah LPJ kegiatan : {{ summary.lpj_kegiatan }}</p>
+      <div class="col-lg-4">
+        <div class="card bg-primary text-white shadow">
+          <div class="card-body">
+            Total pencairan
+            <div class="text-white-50 small">
+              {{ summary.pencairan }}
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-4">
+        <div class="card bg-primary text-white shadow">
+          <div class="card-body">
+            Total LPJ Keuangan
+            <div class="text-white-50 small">
+              {{ summary.lpj_keuangan }}
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-4">
+        <div class="card bg-primary text-white shadow">
+          <div class="card-body">
+            Total LPJ kegiatan
+            <div class="text-white-50 small">
+              {{ summary.lpj_kegiatan }}
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
     <div class="col-xl-12 col-lg-12 card-body">
       <b-table
