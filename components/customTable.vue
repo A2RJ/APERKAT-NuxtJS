@@ -1,7 +1,7 @@
 <template>
   <b-container fluid>
     <b-row>
-      <b-col lg="6" class="my-1">
+      <b-col lg="12" class="my-1">
         <span v-for="action in actions" :key="action.name">
           <NuxtLink
             v-if="action.type == 'link'"
@@ -19,7 +19,7 @@
           </button>
         </span>
       </b-col>
-      <b-col lg="6" class="my-1">
+      <b-col lg="12" class="my-1">
         <b-row>
           <b-col lg="4" class="my-1">
             <b-form-group

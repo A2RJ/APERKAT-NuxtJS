@@ -132,3 +132,6 @@
 - akses ke bu atun (lpj keuangan)
 - download exel
 - ubah nama direktur kuangan (2) menjadi pencairan
+
+## debugging tools
+- [axios-catch-error](https://gist.github.com/fgilio/230ccd514e9381fafa51608fcf137253)

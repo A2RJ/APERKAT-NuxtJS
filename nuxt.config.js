@@ -1,3 +1,4 @@
+// const url = process.env.IS_DEV ? process.env.DEV_URL : process.env.PROD_URL;
 const isDev = false;
 const url = isDev ? "http://127.0.0.1:8000" : "https://aperkat.uts.ac.id/api";
 
@@ -38,6 +39,8 @@ export default {
     "@/plugins/axios.js",
     "@/plugins/numeral.js",
     "@/plugins/vuelidate.js",
+    "@/plugins/custom-middleware.js",
+    { src: "~/plugins/chart.js", mode: "client" },
     // "@nuxtjs/proxy",
     // {src: '~/plugins/vue-list-picker.js', mode: 'client'},
   ],
@@ -91,11 +94,22 @@ export default {
   },
 
   router: {
-    middleware: ["auth"],
+    middleware: ["auth", "authorized"],
   },
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
-  build: {},
+  build: {
+    analyze: true,
+    collapseBooleanAttributes: true,
+    decodeEntities: true,
+    minifyCSS: true,
+    minifyJS: true,
+    processConditionalComments: true,
+    removeEmptyAttributes: true,
+    removeRedundantAttributes: true,
+    trimCustomFragments: true,
+    useShortDoctype: true,
+  },
   server: {
     // port: 3000 // default: 3000
   },

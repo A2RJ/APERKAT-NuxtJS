@@ -3,54 +3,6 @@
     <div class="col-xl-12 col-lg-12 card-body">
       <b-tabs content-class="mt-3" v-if="userLogin == 120">
         <b-tab title="Belum Pencairan" active>
-          <custom-table
-            :items="listPencairan"
-            :fields="fieldsWR2TF"
-            :html="key"
-            :actions="actions"
-          >
-            <template v-slot:kode_rkat="row">
-              {{ row.item.kode_rkat }}
-            </template>
-            <template v-slot:rkat="row">
-              {{ row.item.nama_program }}
-            </template>
-            <template v-slot:biaya_program="row">
-              RP. {{ row.item.biaya_program | currency }}
-            </template>
-            <template v-slot:biaya_disetujui="row">
-              RP. {{ row.item.biaya_disetujui | currency }}
-            </template>
-            <template v-slot:pencairan="row">
-              <ul
-                v-for="pencairan in row.item.pencairan"
-                :key="pencairan.index"
-              >
-                <li>
-                  <a :href="'https://aperkat.uts.ac.id/api/public/file/'+ pencairan.images"
-                    >Rp. {{ pencairan.nominal | currency }}</a
-                  >
-                </li>
-              </ul>
-            </template>
-            <template v-slot:actions="row">
-              <b-button
-                class="btn btn-sm my-1 mr-1"
-                variant="outline-warning"
-                v-b-modal.modal-1
-                @click="
-                  uploadPencairan(row.item.id_pengajuan, row.item.kode_rkat)
-                "
-                >Pencairan</b-button
-              >
-              <NuxtLink
-                class="btn btn-sm btn-outline-info"
-                :to="'/pengajuan/subordinate/edit/' + row.item.id_pengajuan"
-                :key="'edit' + row.index"
-                >Detail</NuxtLink
-              >
-            </template>
-          </custom-table>
           <!-- hide button modals -->
           <b-modal ref="modal" id="modal-1" :title="selectedRKAT" hide-footer>
             <div class="m-3">
@@ -104,7 +56,7 @@
                 </button>
 
                 <button
-                  class="btn btn-sm btn-outline-success mb-3"
+                  class="btn btn-sm btn-outline-warning mb-3"
                   @click="selesaiUpload"
                 >
                   Upload Bukti Transfer Selesai
@@ -112,6 +64,59 @@
               </div>
             </div>
           </b-modal>
+
+          <custom-table
+            :items="listPencairan"
+            :fields="fieldsWR2TF"
+            :html="key"
+            :actions="actions"
+          >
+            <template v-slot:kode_rkat="row">
+              {{ row.item.kode_rkat }}
+            </template>
+            <template v-slot:rkat="row">
+              {{ row.item.nama_program }}
+            </template>
+            <template v-slot:biaya_program="row">
+              RP. {{ row.item.biaya_program | currency }}
+            </template>
+            <template v-slot:biaya_disetujui="row">
+              RP. {{ row.item.biaya_disetujui | currency }}
+            </template>
+            <template v-slot:pencairan="row">
+              <ul
+                v-for="pencairan in row.item.pencairan"
+                :key="pencairan.index"
+              >
+                <li>
+                  <a
+                    :href="
+                      'https://aperkat.uts.ac.id/api/public/file/' +
+                      pencairan.images
+                    "
+                    >Rp. {{ pencairan.nominal | currency }}</a
+                  >
+                </li>
+              </ul>
+            </template>
+            <template v-slot:actions="row">
+              <b-button
+                class="btn btn-sm my-1 mr-1"
+                variant="outline-warning"
+                v-b-modal.modal-1
+                @click="
+                  uploadPencairan(row.item.id_pengajuan, row.item.kode_rkat)
+                "
+                >Pencairan</b-button
+              >
+              <NuxtLink
+                class="btn btn-sm btn-outline-info"
+                :to="'/pengajuan/supervisor/edit/' + row.item.id_pengajuan"
+                :key="'edit' + row.index"
+                >Detail</NuxtLink
+              >
+            </template>
+          </custom-table>
         </b-tab>
         <b-tab title="Sudah Pencairan">
           <custom-table
@@ -138,7 +143,11 @@
                 :key="pencairan.index"
               >
                 <li>
-                  <a :href="'https://aperkat.uts.ac.id/api/public/file/'+ pencairan.images"
+                  <a
+                    :href="
+                      'https://aperkat.uts.ac.id/api/public/file/' +
+                      pencairan.images
+                    "
                     >Rp. {{ pencairan.nominal | currency }}</a
                   >
                 </li>
@@ -147,7 +156,7 @@
             <template v-slot:actions="row">
               <NuxtLink
                 class="btn btn-sm btn-outline-info"
-                :to="'/pengajuan/subordinate/edit/' + row.item.id_pengajuan"
+                :to="'/pengajuan/supervisor/edit/' + row.item.id_pengajuan"
                 :key="'edit' + row.index"
                 >Detail</NuxtLink
               >
@@ -181,21 +190,30 @@
                 :key="pencairan.index"
               >
                 <li>
-                  <a :href="'https://aperkat.uts.ac.id/api/public/file/'+ pencairan.images"
+                  <a
+                    :href="
+                      'https://aperkat.uts.ac.id/api/public/file/' +
+                      pencairan.images
+                    "
                     >Rp. {{ pencairan.nominal | currency }}</a
                   >
                 </li>
               </ul>
             </template>
             <template v-slot:lpj_keuangan="row">
-              <a v-if="row.item.lpj_keuangan" :href="'https://aperkat.uts.ac.id/api/public/file/'+ row.item.lpj_keuangan"
+              <a
+                v-if="row.item.lpj_keuangan"
+                :href="
+                  'https://aperkat.uts.ac.id/api/public/file/' +
+                  row.item.lpj_keuangan
+                "
                 >Preview</a
               >
             </template>
             <template v-slot:actions="row">
               <NuxtLink
                 class="btn btn-sm btn-outline-info"
-                :to="'/pengajuan/subordinate/edit/' + row.item.id_pengajuan"
+                :to="'/pengajuan/supervisor/edit/' + row.item.id_pengajuan"
                 :key="'edit' + row.index"
                 >Detail</NuxtLink
               >
@@ -227,14 +245,23 @@
                 :key="pencairan.index"
               >
                 <li>
-                  <a :href="'https://aperkat.uts.ac.id/api/public/file/'+ pencairan.images"
+                  <a
+                    :href="
+                      'https://aperkat.uts.ac.id/api/public/file/' +
+                      pencairan.images
+                    "
                     >Rp. {{ pencairan.nominal | currency }}</a
                   >
                 </li>
               </ul>
             </template>
             <template v-slot:lpj_keuangan="row">
-              <a v-if="row.item.lpj_keuangan" :href="'https://aperkat.uts.ac.id/api/public/file/'+ row.item.lpj_keuangan"
+              <a
+                v-if="row.item.lpj_keuangan"
+                :href="
+                  'https://aperkat.uts.ac.id/api/public/file/' +
+                  row.item.lpj_keuangan
+                "
                 >Preview</a
               >
             </template>
@@ -255,7 +282,7 @@
               >
               <NuxtLink
                 class="btn btn-sm btn-outline-info"
-                :to="'/pengajuan/subordinate/edit/' + row.item.id_pengajuan"
+                :to="'/pengajuan/supervisor/edit/' + row.item.id_pengajuan"
                 :key="'edit' + row.index"
                 >Detail</NuxtLink
               >
@@ -287,21 +314,30 @@
                 :key="pencairan.index"
               >
                 <li>
-                  <a :href="'https://aperkat.uts.ac.id/api/public/file/'+ pencairan.images"
+                  <a
+                    :href="
+                      'https://aperkat.uts.ac.id/api/public/file/' +
+                      pencairan.images
+                    "
                     >Rp. {{ pencairan.nominal | currency }}</a
                   >
                 </li>
               </ul>
             </template>
             <template v-slot:lpj_keuangan="row">
-              <a v-if="row.item.lpj_keuangan" :href="'https://aperkat.uts.ac.id/api/public/file/'+ row.item.lpj_keuangan"
+              <a
+                v-if="row.item.lpj_keuangan"
+                :href="
+                  'https://aperkat.uts.ac.id/api/public/file/' +
+                  row.item.lpj_keuangan
+                "
                 >Preview</a
               >
             </template>
             <template v-slot:actions="row">
               <NuxtLink
                 class="btn btn-sm btn-outline-info"
-                :to="'/pengajuan/subordinate/edit/' + row.item.id_pengajuan"
+                :to="'/pengajuan/supervisor/edit/' + row.item.id_pengajuan"
                 :key="'edit' + row.index"
                 >Detail</NuxtLink
               >
@@ -313,7 +349,7 @@
   </div>
 </template>
 <script>
-import { mapActions, mapState } from "vuex";
+import { mapActions } from "vuex";
 
 export default {
   async asyncData({ store }) {
@@ -379,7 +415,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions("subordinate", ["approved", "declined"]),
+    ...mapActions("subordinate", ["approved", "declined", "autoLpjKegiatan"]),
     async lpjKeuangan() {
       this.$axios
         .get("/pengajuan/lpjKeuangan")
@@ -449,32 +485,24 @@ export default {
           this.loader("loading...");
           const form = new FormData();
           form.append("file", this.pencairan);
-
           try {
-            await this.$axios.post("/pengajuan/upload", form).then((res) => {
-              this.buktiTFImage = res.data;
-              // axios post pencairan image
-              if (this.buktiTFImage) {
-                this.$axios
-                  .post(`/pencairan`, {
-                    pengajuan_id: this.selectedID,
-                    nominal: this.pencairanNominal.replaceAll(".", ""),
-                    images: this.buktiTFImage,
-                  })
-                  .then((res) => {
-                    this.success("Berhasil upload bukti pencairan");
-                    this.$refs["modal"].hide();
-                    window.location.reload();
-                  })
-                  .catch((err) => {
-                    this.failed("Whoops Server Error");
-                  });
-              } else {
-                this.failed("Upload ulang file");
-              }
-            });
+            const res = await this.$axios.post("/pengajuan/upload", form);
+            this.buktiTFImage = res.data;
+            if (this.buktiTFImage) {
+              const data = {
+                pengajuan_id: this.selectedID,
+                nominal: this.pencairanNominal.replaceAll(".", ""),
+                images: this.buktiTFImage,
+              };
+              await this.$axios.post(`/pencairan`, data);
+              this.success("Berhasil upload bukti pencairan");
+              this.$refs["modal"].hide();
+              window.location.reload();
+            } else {
+              this.failed("Upload ulang file");
+            }
           } catch (e) {
-            console.log("Whoops Server Error");
+            this.failed("Whoops Server Error");
           }
         }
       } else {
@@ -506,34 +534,34 @@ export default {
         confirmButtonColor: "#d33",
         cancelButtonColor: "#3085d6",
         confirmButtonText: "OK",
-      }).then((result) => {
+      }).then(async (result) => {
         if (result.isConfirmed) {
-          this.loader("loading...");
-          this.approved({
-            id: this.selectedID,
-            message: "Pencairan selesai",
-            status_validasi: 3,
-            id_struktur: 24,
-            next: 24,
-            nama_status: "Direktur Keuangan",
-            pencairan: "default.jpg",
-          })
-            .then(() => {
-              this.success("Upload bukti pencairan selesai");
-              this.$refs["modal"].hide();
-              window.location.reload();
-            })
-            .catch(() => {
-              this.failed("Whoops Server Error");
+          try {
+            this.loader("loading...");
+            await this.approved({
+              id: this.selectedID,
+              message: "Pencairan selesai",
+              status_validasi: 3,
+              id_struktur: 24,
+              next: 24,
+              nama_status: "Direktur Keuangan",
+              pencairan: "default.jpg",
             });
+            this.success("Upload bukti pencairan selesai");
+            this.$refs["modal"].hide();
+            window.location.reload();
+          } catch (error) {
+            this.failed("Whoops Server Error");
+          }
         }
       });
     },
     uploadPencairan(params, koderkat) {
       this.selectedRKAT = koderkat;
       this.selectedID = params;
+      console.log(this.selectedRKAT, this.selectedID);
     },
-    aprroveLPJKeuangan(params) {
+    async aprroveLPJKeuangan(params) {
       this.$swal({
         title: "Warning!",
         text: "Terima LPJ Keuangan ?",
@@ -550,27 +578,28 @@ export default {
         preConfirm: (login) => {},
       }).then(async (result) => {
         if (result.isConfirmed) {
-          this.loader("loading...");
-          this.approved({
-            id: params,
-            message: result.value,
-            status_validasi: 4,
-            id_struktur: 24,
-            nama_status: "Direktorat Keuangan",
-            next: 21,
-          })
-            .then(async () => {
-              this.success("Berhasil terima pengajuan");
-              this.lpjKeuangan();
-              this.getBelumLPJKeuangan();
-            })
-            .catch(() => {
-              this.failed("Whoops Server Error");
-            });
+          try {
+            this.loader("loading...");
+            const data = {
+              id: params,
+              message: result.value,
+              status_validasi: 4,
+              id_struktur: 24,
+              nama_status: "Direktorat Keuangan",
+              next: 21,
+            };
+            await this.approved(data);
+            await this.autoLpjKegiatan(params);
+            this.success("Berhasil terima pengajuan");
+            this.lpjKeuangan();
+            this.getBelumLPJKeuangan();
+          } catch (error) {
+            this.failed("Whoops Server Error");
+          }
         }
       });
     },
-    declineLPJKeuangan(params) {
+    async declineLPJKeuangan(params) {
       this.$swal({
         title: "Warning!",
         text: "Tolak LPJ Keuangan ?",
@@ -587,23 +616,23 @@ export default {
         preConfirm: (login) => {},
       }).then(async (result) => {
         if (result.isConfirmed) {
-          this.loader("loading...");
-          this.approved({
-            id: params,
-            message: result.value,
-            status_validasi: 0,
-            id_struktur: 24,
-            nama_status: "Direktorat Keuangan",
-            next: 24,
-          })
-            .then(async () => {
-              this.success("Berhasil terima pengajuan");
-              this.lpjKeuangan();
-              this.getBelumLPJKeuangan();
-            })
-            .catch(() => {
-              this.failed("Whoops Server Error");
-            });
+          try {
+            this.loader("loading...");
+            const data = {
+              id: params,
+              message: result.value,
+              status_validasi: 0,
+              id_struktur: 24,
+              nama_status: "Direktorat Keuangan",
+              next: 24,
+            };
+            await this.approved(data);
+            this.success("Berhasil tolak pengajuan");
+            this.lpjKeuangan();
+            this.getBelumLPJKeuangan();
+          } catch (error) {
+            this.failed("Whoops Server Error");
+          }
         }
       });
     },

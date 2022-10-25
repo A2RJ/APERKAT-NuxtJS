@@ -6,9 +6,10 @@
 </template>
 <script>
 import { mapActions, mapState } from "vuex";
-import pencairanLpjKeuangan from '../components/pencairanLpjKeuangan.vue';
+import pencairanLpjKeuangan from "../components/pencairanLpjKeuangan.vue";
 
 export default {
+  middleware: ["authorized"],
   components: { pencairanLpjKeuangan },
   async asyncData({ store }) {
     await Promise.all([
@@ -22,28 +23,6 @@ export default {
   data() {
     return {
       userLogin: this.$store.state.auth.user[0].id_user,
-      options: {},
-      chartData: {},
-      keyRKAT: "id_rkat",
-      fields: [
-        { key: "fullname", label: "User" },
-        { key: "nama_struktur", label: "Pelaksana" },
-        { key: "kode_rkat", label: "Kode RKAT" },
-        { key: "created_at", label: "Waktu Pengajuan" },
-        { key: "rencana_anggaran", label: "Total Anggaran" },
-        { key: "biaya_program", label: "Total Realisasi" },
-        "persentase",
-        "actions",
-      ],
-      key: "id_pengajuan",
-      actions: [],
-      pengajuan: [
-        { key: "fullname", label: "Pelaksana" },
-        { key: "kode_rkat", label: "Kode RKAT" },
-        { key: "biaya_program", label: "Anggaran" },
-        { key: "created_at", label: "Waktu Pengajuan" },
-        "actions",
-      ],
     };
   },
   computed: {
@@ -51,44 +30,9 @@ export default {
       grafik: (state) => state.grafik,
     }),
   },
-  mounted() {
-    this.options = {
-      responsive: true,
-      maintainAspectRatio: false,
-      scales: {
-        yAxes: [
-          {
-            ticks: {
-              beginAtZero: false,
-            },
-          },
-        ],
-      },
-    };
-
-    this.chartData = {
-      labels: ["Kas", "Kredit"],
-      datasets: [
-        {
-          backgroundColor: ["#4e73df", "#1cc88a"],
-          data: [
-            this.grafik.data.total_anggaran_rkat,
-            this.grafik.data.total_rkat_diterima,
-          ],
-        },
-      ],
-    };
-  },
+  mounted() {},
   methods: {
     ...mapActions("subordinate", ["getGrafik"]),
-    // cek apakah user telah login
-    isLoggedIn() {
-      return this.$auth.loggedIn();
-    },
-    // cek apakah user adalah admin
-    isAdmin() {
-      return this.$auth.user.role === "admin";
-    },
   },
 };
 </script>

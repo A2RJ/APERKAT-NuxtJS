@@ -4,7 +4,7 @@
     class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion"
     id="accordionSidebar"
   >
-  <!-- ffa600 -->
+    <!-- ffa600 -->
     <!-- Sidebar - Brand -->
     <a
       class="sidebar-brand d-flex align-items-center justify-content-center"
@@ -34,7 +34,7 @@
 
       <!-- Nav Item -->
 
-      <li class="nav-item" v-show="sekniv">
+      <li class="nav-item" v-if="sekniv">
         <NuxtLink class="nav-link" to="/rkat">
           <i class="fas fa-fw fa-chart-area"></i>
           <span>RKAT</span>
@@ -65,71 +65,47 @@
             v-if="this.$store.state.auth.user"
           >
             <h6 class="collapse-header">Daftar Pengajuan</h6>
-            <NuxtLink class="collapse-item" :to="'/pengajuan/subordinate/'"
+            <NuxtLink
+              class="collapse-item"
+              :to="'/pengajuan/subordinate/'"
+              v-if="prodi || dirKeuangan"
               >Pengajuan</NuxtLink
             >
-            <NuxtLink class="collapse-item" :to="'/pengajuan/subordinate/summary/' + userLogin"
+            <NuxtLink
+              class="collapse-item"
+              :to="'/pengajuan/subordinate/summary/' + userLogin"
+              v-if="prodi || dirKeuangan"
               >Summary Pengajuan</NuxtLink
             >
             <NuxtLink
               class="collapse-item"
-              v-show="fakultas || dirKeuangan || warek || rektor || sekniv"
+              v-if="fakultas || dirKeuangan || warek || sekniv || rektor"
               :to="'/pengajuan/supervisor/'"
-              >Pengajuan Sub Divisi
+              >Pengajuan sub divisi
             </NuxtLink>
             <NuxtLink
               class="collapse-item"
-              v-show="warek2"
+              v-if="dirKeuangan || warek2 || sekniv || rektor"
               :to="'/pengajuan/supervisor/summary'"
               >Summary
             </NuxtLink>
             <NuxtLink
               class="collapse-item"
-              v-show="fakultas || dirKeuangan || warek || rektor || sekniv"
+              v-if="fakultas || warek"
+              :to="'/pengajuan/supervisor/summary/' + this.userLogin"
+              >Summary sub divisi
+            </NuxtLink>
+            <NuxtLink
+              class="collapse-item"
+              v-if="fakultas || dirKeuangan || warek || sekniv || rektor"
               :to="'/pengajuan/grafik/'"
-              >Grafik Sub Divisi</NuxtLink
+              >Grafik sub divisi</NuxtLink
             >
           </div>
         </div>
       </li>
 
-      <!-- <li class="nav-item">
-        <a
-          class="nav-link collapsed"
-          href="#"
-          data-toggle="collapse"
-          data-target="#collapseTwo"
-          aria-expanded="true"
-          aria-controls="collapseTwo"
-        >
-          <i class="fas fa-fw fa-cog"></i>
-          <span>NON RKAT</span>
-        </a>
-        <div
-          id="collapseTwo"
-          class="collapse"
-          aria-labelledby="headingTwo"
-          data-parent="#accordionSidebar"
-        >
-          <div
-            class="bg-white py-2 collapse-inner rounded"
-            v-if="this.$store.state.auth.user"
-          >
-            <h6 class="collapse-header">Daftar Non RKAT</h6>
-            <NuxtLink class="collapse-item" :to="'/nonrkat/subordinate/'"
-              >Non RKAT
-            </NuxtLink>
-            <NuxtLink
-              class="collapse-item"
-              v-show="fakultas || dirKeuangan || warek || rektor || sekniv"
-              :to="'/nonrkat/supervisor/'"
-              >Non RKAT Sub Divisi
-            </NuxtLink>
-          </div>
-        </div>
-      </li> -->
-
-      <li class="nav-item" v-show="sekniv">
+      <li class="nav-item" v-if="sekniv">
         <NuxtLink class="nav-link" to="/user">
           <i class="fas fa-fw fa-chart-area"></i>
           <span>User</span>
@@ -158,19 +134,15 @@ export default {
       warek2: false,
       rektor: false,
       sekniv: false,
-      userLogin: this.$store.state.auth.user[0].id_user,
       notUser: true,
+      userLogin: this.$store.state.auth.loggedIn
+        ? this.$store.state.auth.user[0].id_user
+        : [],
     };
   },
   computed: {},
   methods: {},
   mounted() {
-    if (this.userLogin == 120) {
-      this.notUser = false;
-    }
-    if (this.userLogin == 121) {
-      this.notUser = false;
-    }
     if (this.$store.state.auth.loggedIn) {
       let data = this.$store.state.auth.user[1].level;
       if (data == "prodi") {
@@ -186,10 +158,17 @@ export default {
       } else if (data == "sekniv") {
         this.sekniv = true;
       }
-    }
 
-    if (this.userLogin == 23) {
-      this.warek2 = true;
+      if (this.userLogin == 23) {
+        this.warek2 = true;
+      }
+
+      if (this.userLogin == 120) {
+        this.notUser = false;
+      }
+      if (this.userLogin == 121) {
+        this.notUser = false;
+      }
     }
   },
 };

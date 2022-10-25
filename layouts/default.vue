@@ -1,7 +1,10 @@
 <template>
   <div>
     <!-- Page Wrapper -->
-    <div id="wrapper" v-if="isAuth">
+    <div v-show="!isLoggedIn">
+      <Nuxt />
+    </div>
+    <div id="wrapper" v-show="isLoggedIn">
       <!-- Sidebar -->
       <Sidebar></Sidebar>
       <!-- Content Wrapper -->
@@ -26,10 +29,6 @@
       </div>
       <!-- End of Content Wrapper -->
     </div>
-
-    <div v-else>
-      <Nuxt />
-    </div>
     <!-- End of Page Wrapper -->
   </div>
 </template>
@@ -37,7 +36,6 @@
 <script>
 import Sidebar from "@/components/Sidebar.vue";
 import Topbar from "@/components/Topbar.vue";
-import Footer from "@/components/Footer.vue";
 import { mapState, mapMutations } from "vuex";
 
 export default {
@@ -45,31 +43,20 @@ export default {
 
   data() {
     return {
-      // isAuth: this.$auth.loggedIn
+      isLoggedIn: this.$store.state.auth.loggedIn,
     };
   },
   computed: {
-    ...mapState(["isAuth", "ardi", "level"]),
+    ...mapState(["isAuth", "level"]),
   },
   methods: {
-    ...mapMutations(["SET_IS_AUTH", "SET_USER_DATA", "SET_LEVEL"]),
+    ...mapMutations(["SET_IS_AUTH", , "SET_LEVEL"]),
   },
   components: {
     Sidebar: Sidebar,
     Topbar: Topbar,
-    Footer: Footer,
   },
   mounted() {
-    if (this.$store.state.auth.loggedIn) {
-      this.SET_IS_AUTH(this.$store.state.auth.loggedIn);
-      this.SET_USER_DATA(this.$store.state.auth.user[0]);
-      this.SET_LEVEL(this.$store.state.auth.user[1].level);
-    } else {
-      // this.SET_IS_AUTH(false);
-      // this.SET_USER_DATA(null);
-      // this.SET_LEVEL(null);
-      this.$router.push("/login");
-    }
     !(function (t) {
       "use strict";
       t("#sidebarToggle, #sidebarToggleTop").on("click", function (o) {

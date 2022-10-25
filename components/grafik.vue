@@ -64,8 +64,10 @@
       </div>
     </div>
     <div class="col-lg-4 card">
-      <chart ref="skills_chart" :chart-data="chartData" :options="options">
-      </chart>
+      <!-- <chart :data="chartData" :options="options"> </chart> -->
+      <client-only>
+        <doughnut-chart :data="chartData"></doughnut-chart>
+      </client-only>
     </div>
     <div class="col-lg-12 card mt-2">
       <div class="mt-2 m-1">
@@ -235,6 +237,7 @@ export default {
       fields: [
         { key: "fullname", label: "User" },
         { key: "nama_struktur", label: "Pelaksana" },
+        { key: "nama_program", label: "Nama Program" },
         { key: "kode_rkat", label: "Kode RKAT" },
         { key: "rencana_anggaran", label: "Total Anggaran" },
         { key: "biaya_program", label: "Total Realisasi" },
@@ -289,6 +292,12 @@ export default {
   },
   methods: {
     ...mapActions("subordinate", ["getGrafik"]),
+    idrFormat(number) {
+      return new Intl.NumberFormat("id-ID", {
+        style: "currency",
+        currency: "IDR",
+      }).format(number);
+    },
   },
 };
 </script>

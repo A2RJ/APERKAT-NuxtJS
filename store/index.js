@@ -1,7 +1,6 @@
 export const state = () => ({
     isAuth: false,
     token: null,
-    ardi: null,
     level: null
 })
 
@@ -16,9 +15,6 @@ export const mutations = {
 
     loggedUser(state) {
         return state.auth.user[0]
-    },
-    SET_USER_DATA(state, payload) {
-        state.ardi = payload
     },
 
     SET_API_TOKEN(state, payload) {
@@ -35,6 +31,5 @@ export const actions = {
         if (context.app.$auth.strategy.token.status().valid()) {
             commit('SET_IS_AUTH', true);
         }
-        
     }
 }

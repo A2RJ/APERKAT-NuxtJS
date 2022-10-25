@@ -50,9 +50,8 @@
               <p v-else>Belum</p>
         </template>
         <template #cell(lpj_kegiatan)="data">
-          <a v-if="data.item.lpj_kegiatan" :href="'https://aperkat.uts.ac.id/api/public/file/'+ data.item.lpj_kegiatan"
-                >Sudah</a>
-              <p v-else>Belum</p>
+          <a v-if="data.item.lpj_kegiatan" :href="'https://aperkat.uts.ac.id/api/public/file/'+ data.item.lpj_kegiatan">Sudah</a>
+          <p v-else>Belum</p>
         </template>
       </b-table>
     </div>
@@ -60,6 +59,7 @@
 </template>
 <script>
 export default {
+  middleware: ["pages/subdivisi"],
   data() {
     return {
       data: [],

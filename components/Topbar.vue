@@ -13,7 +13,7 @@
     </button>
 
     <!-- Topbar Search -->
-    <form
+    <!-- <form
       class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search"
     >
       <div class="input-group">
@@ -30,7 +30,7 @@
           </button>
         </div>
       </div>
-    </form>
+    </form> -->
 
     <!-- Topbar Navbar -->
     <ul class="navbar-nav ml-auto">
@@ -93,11 +93,11 @@ export default {
     };
   },
   computed: {
-    ...mapState(["isAuth", "ardi", "user"]),
+    ...mapState(["isAuth", "user"]),
   },
   mounted() {},
   methods: {
-    ...mapMutations(["SET_IS_AUTH", "SET_USER_DATA"]),
+    ...mapMutations(["SET_IS_AUTH"]),
     toggled() {
       const el = document.getElementById("accordionSidebar");
       el.classList.toggle("toggled");
@@ -105,10 +105,7 @@ export default {
     async logout() {
       try {
         await this.$auth.logout();
-        // this.SET_IS_AUTH(false);
-        // this.SET_USER_DATA(null);
-        // this.$router.push("/login");
-        window.location.href = "/login";
+        window.location.href = "/";
       } catch (err) {
         console.log(err);
       }
@@ -120,5 +117,4 @@ export default {
 };
 </script>
 
-<style>
-</style>
+<style></style>

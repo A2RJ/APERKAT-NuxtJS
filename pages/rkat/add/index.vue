@@ -24,25 +24,20 @@ import rkatform from "~/components/form/rkat.vue";
 import { mapActions, mapState, mapMutations } from "vuex";
 
 export default {
-    async asyncData({ store, params }) {
-    await Promise.all([
-      store.dispatch("rkat/getUser")
-    ]);
+  middleware: ["pages/rkat", "roles/sekniv"],
+  async asyncData({ store, params }) {
+    await Promise.all([store.dispatch("rkat/getUser")]);
     return;
   },
   components: {
-      'form-rkat': rkatform
+    "form-rkat": rkatform,
   },
-  mounted() {
-    // this.SET_IS_AUTH(this.$store.state.auth.loggedIn);
-    // this.SET_USER_DATA(this.$store.state.auth.user[0]);
-  },
+  mounted() {},
   methods: {
-    ...mapMutations(["SET_IS_AUTH", "SET_USER_DATA", "SET_RKAT_USER"]),
+    ...mapMutations(["SET_IS_AUTH", "SET_RKAT_USER"]),
     ...mapActions("rkat", ["getUser"]),
   },
 };
 </script>
 
-<style>
-</style>
+<style></style>

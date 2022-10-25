@@ -317,7 +317,7 @@
 
 <script>
 import { mapActions, mapState } from "vuex";
-import { required, numeric } from "vuelidate/lib/validators";
+import { required } from "vuelidate/lib/validators";
 
 export default {
   async created() {

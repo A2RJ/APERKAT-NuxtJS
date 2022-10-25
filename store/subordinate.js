@@ -95,13 +95,13 @@ export const mutations = {
 
   SET_LPJ(state, payload) {
     state.lpj = payload;
-  }
+  },
 };
 
 export const actions = {
   getpengajuan({ commit }, payload) {
     return new Promise((resolve, reject) => {
-      this.$axios.get(`/pengajuan/byUser/${payload}`).then(response => {
+      this.$axios.get(`/pengajuan/byUser/${payload}`).then((response) => {
         commit("SET_PENGAJUAN_DATA", response.data.data);
         resolve();
       });
@@ -111,7 +111,7 @@ export const actions = {
     return new Promise((resolve, reject) => {
       this.$axios
         .get(`/pengajuan/pengajuanSelesai/${payload}`)
-        .then(response => {
+        .then((response) => {
           commit("SET_PENGAJUAN_SELESAI", response.data.data);
           resolve();
         });
@@ -119,7 +119,7 @@ export const actions = {
   },
   getpengajuanID({ commit }, payload) {
     return new Promise((resolve, reject) => {
-      this.$axios.get(`/pengajuan/${payload}`).then(response => {
+      this.$axios.get(`/pengajuan/${payload}`).then((response) => {
         commit("SET_DATA", response.data.data);
         resolve();
       });
@@ -129,11 +129,11 @@ export const actions = {
     return new Promise((resolve, reject) => {
       this.$axios
         .post("/pengajuan", payload)
-        .then(response => {
+        .then((response) => {
           dispatch("getpengajuan");
           resolve();
         })
-        .catch(function(error) {
+        .catch(function (error) {
           if (error.response) {
             commit("SET_ERRORS", error.response.data);
             reject();
@@ -148,11 +148,11 @@ export const actions = {
     return new Promise((resolve, reject) => {
       this.$axios
         .post(`/pengajuan/${payload.id}`, payload)
-        .then(response => {
+        .then((response) => {
           dispatch("getpengajuan");
           resolve();
         })
-        .catch(e => {
+        .catch((e) => {
           commit("SET_ERRORS", e.response);
         });
     });
@@ -161,26 +161,26 @@ export const actions = {
     return new Promise((resolve, reject) => {
       this.$axios
         .get(`/pengajuan/delete/${payload}`)
-        .then(response => {
+        .then((response) => {
           dispatch("getpengajuan");
           resolve();
         })
-        .catch(e => {
+        .catch((e) => {
           commit("SET_ERRORS", e.response.data);
         });
     });
   },
   getstatus({ commit }, payload) {
     return new Promise((resolve, reject) => {
-      this.$axios.get(`/pengajuan/status/${payload}`).then(response => {
-        commit("SET_STATUS", response.data.data);
+      this.$axios.get(`/pengajuan/status/${payload}`).then((response) => {
+        commit("SET_STATUS", response.data);
         resolve();
       });
     });
   },
   gethistory({ commit }, payload) {
     return new Promise((resolve, reject) => {
-      this.$axios.get(`/pengajuan/history/${payload}`).then(response => {
+      this.$axios.get(`/pengajuan/history/${payload}`).then((response) => {
         commit("SET_HISTORY", response.data.data);
         resolve();
       });
@@ -190,11 +190,11 @@ export const actions = {
     return new Promise((resolve, reject) => {
       this.$axios
         .post(`/pengajuan/approve/${payload.id}`, payload)
-        .then(response => {
+        .then((response) => {
           dispatch("getpengajuan");
           resolve();
         })
-        .catch(e => {
+        .catch((e) => {
           commit("SET_ERRORS", e.response.data);
         });
     });
@@ -203,11 +203,11 @@ export const actions = {
     return new Promise((resolve, reject) => {
       this.$axios
         .post(`/pengajuan/decline/${payload.id}`, payload)
-        .then(response => {
+        .then((response) => {
           dispatch("getpengajuan");
           resolve();
         })
-        .catch(e => {
+        .catch((e) => {
           commit("SET_ERRORS", e.response.data);
         });
     });
@@ -216,7 +216,7 @@ export const actions = {
     return new Promise((resolve, reject) => {
       this.$axios
         .get(`/pengajuan/pengajuanSubordinate/${payload}`)
-        .then(response => {
+        .then((response) => {
           commit("SET_SUBORDINATE", response.data.data);
           resolve();
         });
@@ -224,19 +224,17 @@ export const actions = {
   },
   pencairan({ commit }, payload) {
     return new Promise((resolve, reject) => {
-      this.$axios
-        .get(`/pencairan/${payload}`)
-        .then(response => {
-          commit("SET_PENCAIRAN", response.data);
-          resolve();
-        });
+      this.$axios.get(`/pencairan/${payload}`).then((response) => {
+        commit("SET_PENCAIRAN", response.data);
+        resolve();
+      });
     });
   },
   pengajuanNeedApproved({ commit }, payload) {
     return new Promise((resolve, reject) => {
       this.$axios
         .get(`/pengajuan/pengajuanNeedApproved/${payload}`)
-        .then(response => {
+        .then((response) => {
           commit("SET_SUBORDINATENEED", response.data.data);
           resolve();
         });
@@ -244,7 +242,7 @@ export const actions = {
   },
   kodeRKAT({ commit }, payload) {
     return new Promise((resolve, reject) => {
-      this.$axios.get(`/rkat/kodeRKAT/${payload}`).then(response => {
+      this.$axios.get(`/rkat/kodeRKAT/${payload}`).then((response) => {
         commit("SET_KODE_RKAT", response.data);
         resolve();
       });
@@ -252,7 +250,7 @@ export const actions = {
   },
   ikuParent({ commit }) {
     return new Promise((resolve, reject) => {
-      this.$axios.get("/iku").then(response => {
+      this.$axios.get("/iku").then((response) => {
         commit("SET_IKU_PARENT", response.data);
         resolve();
       });
@@ -260,7 +258,7 @@ export const actions = {
   },
   getIkuChild1({ commit }, payload) {
     return new Promise((resolve, reject) => {
-      this.$axios.get(`/iku/child1/${payload}`).then(response => {
+      this.$axios.get(`/iku/child1/${payload}`).then((response) => {
         commit("SET_IKU_CHILD1", response.data);
         resolve();
       });
@@ -268,7 +266,7 @@ export const actions = {
   },
   getIkuChild2({ commit }, payload) {
     return new Promise((resolve, reject) => {
-      this.$axios.get(`/iku/child2/${payload}`).then(response => {
+      this.$axios.get(`/iku/child2/${payload}`).then((response) => {
         commit("SET_IKU_CHILD2", response.data);
         resolve();
       });
@@ -276,7 +274,7 @@ export const actions = {
   },
   getGrafik({ commit }, payload) {
     return new Promise((resolve, reject) => {
-      this.$axios.get(`/pengajuan/getGrafik/${payload}`).then(response => {
+      this.$axios.get(`/pengajuan/getGrafik/${payload}`).then((response) => {
         commit("SET_GRAFIK", response.data);
         resolve();
       });
@@ -286,7 +284,7 @@ export const actions = {
     return new Promise((resolve, reject) => {
       this.$axios
         .get(`/pengajuan/getSubordinatesGrafik/${payload}`)
-        .then(response => {
+        .then((response) => {
           commit("SET_SUBORDINATE_GRAFIK", response.data);
           resolve();
         });
@@ -294,7 +292,7 @@ export const actions = {
   },
   transfer({ commit }) {
     return new Promise((resolve, reject) => {
-      this.$axios.get("/pengajuan/transfer").then(response => {
+      this.$axios.get("/pengajuan/transfer").then((response) => {
         commit("SET_TRANSFER", response.data);
         resolve();
       });
@@ -302,10 +300,20 @@ export const actions = {
   },
   lpj({ commit }) {
     return new Promise((resolve, reject) => {
-      this.$axios.get("/pengajuan/lpjKeuangan").then(response => {
+      this.$axios.get("/pengajuan/lpjKeuangan").then((response) => {
         commit("SET_LPJ", response.data);
         resolve();
       });
     });
-  }
+  },
+  async autoLpjKegiatan({ commit }, payload) {
+    return new Promise((resolve, reject) => {
+      this.$axios
+        .get(`/pengajuan/autoLpjKegiatan/${payload}`)
+        .then((response) => {
+          commit("SET_AUTO_LPJ_KEGIATAN", response.data);
+          resolve();
+        });
+    });
+  },
 };

@@ -8,7 +8,7 @@
         <div class="container-timeline pl-3 pt-3">
           <ul>
             <li
-              v-for="(status, index) in status"
+              v-for="(status, index) in status.data"
               :key="index"
               :class="status.status ? 'approve' : 'decline'"
             >
@@ -33,7 +33,7 @@
         </div>
         <div class="card-body">
           <button
-            class="btn btn-sm btn-outline-success m-1 mr-2"
+            class="btn btn-sm btn-outline-warning m-1 mr-2"
             @click="draftLaporanKeuangan()"
           >
             Download template laporan keuangan
@@ -43,7 +43,9 @@
           </button>
           <a
             v-show="form.lpj_keuangan"
-            :href="'https://aperkat.uts.ac.id/api/public/file/' + form.lpj_keuangan"
+            :href="
+              'https://aperkat.uts.ac.id/api/public/file/' + form.lpj_keuangan
+            "
             target="_blank"
           >
             <button class="btn btn-sm btn-outline-success m-1">
@@ -52,7 +54,9 @@
           </a>
           <a
             v-show="form.lpj_kegiatan"
-            :href="'https://aperkat.uts.ac.id/api/public/file/' + form.lpj_kegiatan"
+            :href="
+              'https://aperkat.uts.ac.id/api/public/file/' + form.lpj_kegiatan
+            "
             target="_blank"
           >
             <button class="btn btn-sm btn-outline-success m-1">
@@ -64,7 +68,9 @@
           <a
             v-show="form.pencairan !== null && form.pencairan !== 'default.jpg'"
             class="btn btn-sm btn-outline-success m-1"
-            :href="'https://aperkat.uts.ac.id/api/public/file/' + form.pencairan"
+            :href="
+              'https://aperkat.uts.ac.id/api/public/file/' + form.pencairan
+            "
             target="_blank"
           >
             Bukti Pencairan
@@ -73,7 +79,9 @@
             v-for="(pencairan, index) in pencairanImg"
             :key="index"
             class="btn btn-sm btn-outline-success m-1"
-            :href="'https://aperkat.uts.ac.id/api/public/file/' + pencairan.images"
+            :href="
+              'https://aperkat.uts.ac.id/api/public/file/' + pencairan.images
+            "
             target="_blank"
             rel="noopener noreferrer"
             >Pencairan {{ index + 1 }} RP. {{ pencairan.nominal | currency }}</a
@@ -129,6 +137,43 @@
                 LPJ Kegiatan
               </button>
             </div>
+            <br />
+            <div v-show="formLPJ1Format" class="m-3">
+              <b-form-group
+                label-cols="4"
+                label-cols-lg="2"
+                label-size="sm"
+                label="LPJ (keuangan dan kegiatan disatukan)"
+                label-for="LPJKeuanganKegiatan"
+              >
+                <b-form-file
+                  v-model="file1"
+                  :state="Boolean(file1)"
+                  placeholder="Choose a file or drop it here..."
+                  drop-placeholder="Drop file here..."
+                ></b-form-file>
+                <div class="mt-3">
+                  Selected file: {{ file1 ? file1.name : "" }}
+                </div>
+                <!-- <b-form-file
+                  id="LPJKeuanganKegiatan"
+                  v-model="LPJNewFormat"
+                  :state="Boolean(LPJNewFormat)"
+                  placeholder="Choose or drop it here..."
+                  drop-placeholder="Drop file here..."
+                  accept=".pdf, .jpg, .png"
+                ></b-form-file>
+                <div class="mt-3">
+                  Selected file: {{ LPJNewFormat ? LPJNewFormat.name : "" }}
+                </div> -->
+              </b-form-group>
+              <button
+                class="btn btn-sm btn-outline-success float-right"
+                @click="uploadLPJNewFormat"
+              >
+                Upload LPJ
+              </button>
+            </div>
           </div>
           <br />
           <div v-show="option" class="m-3">
@@ -155,6 +200,31 @@
               </div>
             </b-form-group>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <div
+      class="col-xl-12 col-lg-12"
+      v-if="this.$route.name == 'pengajuan-subordinate-add'"
+    >
+      <div class="card mb-4">
+        <div class="card-header py-3">
+          <h6 class="m-0 font-weight-bold text-primary">Referensi</h6>
+        </div>
+        <div class="card-body">
+          <b-button
+            class="btn btn-sm my-2 mr-2"
+            variant="outline-success"
+            @click="downloadFile()"
+            >Download Template RAB
+          </b-button>
+          <b-button
+            class="btn btn-sm my-2 mr-2"
+            variant="outline-success"
+            @click="satuanHarga()"
+            >Referensi Satuan Harga
+          </b-button>
         </div>
       </div>
     </div>
@@ -515,6 +585,7 @@
           </b-form-group>
 
           <b-form-group
+            v-show="button"
             label-cols="4"
             label-cols-lg="2"
             label-size="sm"
@@ -522,7 +593,19 @@
             label-for="rab"
             :class="{ 'form-group--error': $v.file.$error }"
           >
-            <!-- v-model="file" -->
+            <b-button
+              variant="outline-success btn-sm mr-2 mb-2"
+              @click="toggleUploadRAB()"
+              >Upload file RAB</b-button
+            >
+            <b-button
+              variant="outline-success btn-sm mb-2"
+              @click="toggleInputRAB()"
+              >Input RAB manual</b-button
+            >
+          </b-form-group>
+
+          <div v-if="uploadRAB" class="mb-5">
             <b-form-file
               id="rab"
               v-model.trim="$v.file.$model"
@@ -536,97 +619,107 @@
             </b-form-text>
             <div class="mt-3" v-if="rab">
               Current file:
-              <a :href="'https://aperkat.uts.ac.id/api/public/file/' + rab" target="_blank">RAB </a>
+              <a
+                :href="'https://aperkat.uts.ac.id/api/public/file/' + rab"
+                target="_blank"
+                >RAB
+              </a>
             </div>
             <b-button
-              class="btn btn-sm my-2 mr-2"
-              @click="downloadFile()"
-              >Download Template RAB
-            </b-button>
-            <b-button
-              class="btn btn-sm my-2 mr-2"
-              @click="satuanHarga()"
-              >Referensi Satuan Harga
-            </b-button>
-            <b-button
-              variant="success"
+              variant="outline-success"
               class="btn btn-sm float-right my-2"
               @click="upload()"
               >Upload
             </b-button>
-          </b-form-group>
-          <b-table
-            striped
-            small
-            responsive
-            hover
-            :items="itemsHeader"
-            :fields="fields"
-            v-show="button"
-          >
-            <template #cell(jenis_barang)>
-              <input
-                v-model="nama_barang"
-                type="text"
-                name="nama_barang"
-                id="nama_barang"
-                required
-              />
-            </template>
-            <template #cell(harga_satuan)>
-              <input
-                v-model="harga_satuan"
-                @keyup="numberFormatHargaSatuan"
-                type="text"
-                name="satuan"
-                id="satuan"
-                required
-              />
-            </template>
-            <template #cell(qty)>
-              <input v-model="qty" type="number" name="qty" id="qty" required />
-            </template>
-            <template #cell(total)>
-              {{ (qty * harga_satuan.replaceAll(".", "")) | currency }}
-            </template>
-            <template #cell(keterangan)>
-              <input v-model="ket" type="text" name="qty" id="qty" required />
-            </template>
-            <template #cell(action)>
-              <button
-                type="button"
-                class="btn btn-sm btn-success"
-                @click="addRAB()"
-              >
-                OK
-              </button>
-            </template>
-          </b-table>
-          <b-table
-            striped
-            small
-            responsive
-            hover
-            :items="items"
-            :fields="fields"
-          >
-            <template #cell(harga_satuan)="data">
-              Rp. {{ data.item.harga_satuan | currency }}
-            </template>
-            <template #cell(total)="data">
-              Rp. {{ data.item.total | currency }}
-            </template>
-            <template #cell(action)="data">
-              <button
-                type="button"
-                class="btn btn-sm btn-danger"
-                v-show="button"
-                @click="hapus(data.item.no)"
-              >
-                X
-              </button>
-            </template>
-          </b-table>
+          </div>
+
+          <div v-if="inputRAB" class="mb-5 custom-style">
+            <b-table
+              striped
+              small
+              responsive
+              hover
+              :items="itemsHeader"
+              :fields="fields"
+              v-show="button"
+            >
+              <template #cell(jenis_barang)>
+                <b-form-textarea
+                  id="nama_barang"
+                  v-model="nama_barang"
+                  max-rows="8"
+                  required
+                ></b-form-textarea>
+              </template>
+              <template #cell(harga_satuan)>
+                <b-form-textarea
+                  @keyup="numberFormatHargaSatuan"
+                  id="satuan"
+                  v-model="harga_satuan"
+                  max-rows="8"
+                  required
+                ></b-form-textarea>
+              </template>
+              <template #cell(qty)>
+                <b-form-textarea
+                  id="qty"
+                  v-model="qty"
+                  max-rows="8"
+                  required
+                ></b-form-textarea>
+              </template>
+              <template #cell(total)>
+                {{ (qty * harga_satuan.replaceAll(".", "")) | currency }}
+              </template>
+              <template #cell(keterangan)>
+                <b-form-textarea
+                  id="qty"
+                  v-model="ket"
+                  max-rows="8"
+                  placeholder="Opsional"
+                  required
+                ></b-form-textarea>
+              </template>
+              <template #cell(action)>
+                <button
+                  type="button"
+                  class="btn btn-sm btn-outline-success"
+                  @click="addRAB()"
+                >
+                  Tambah
+                </button>
+              </template>
+            </b-table>
+          </div>
+
+          <div v-if="items.length > 0">
+            <b-table
+              striped
+              small
+              responsive
+              hover
+              :items="items"
+              :fields="fields"
+            >
+              <template #cell(harga_satuan)="data">
+                Rp. {{ data.item.harga_satuan | currency }}
+              </template>
+              <template #cell(total)="data">
+                Rp. {{ data.item.total | currency }}
+              </template>
+              <template #cell(action)="data">
+                <button
+                  type="button"
+                  class="btn btn-sm btn-outline-danger"
+                  v-show="button"
+                  @click="hapus(data.item.no)"
+                >
+                  Hapus
+                </button>
+              </template>
+            </b-table>
+          </div>
+
           <button
             class="btn btn-sm btn-primary float-right"
             v-show="button"
@@ -712,6 +805,8 @@ export default {
   },
   data() {
     return {
+      file1: null,
+      file2: null,
       form: {
         kode_rkat: null,
         id_user: this.$store.state.auth.user[0].id_user,
@@ -773,6 +868,8 @@ export default {
       formLPJKegiatan: false,
       LPJKeuangan: [],
       LPJKegiatan: [],
+      LPJNewFormat: [],
+      formLPJ1Format: false,
       view: {
         pencairan: false,
         keuangan: false,
@@ -811,6 +908,8 @@ export default {
       ],
       listData: [],
       total: 0,
+      uploadRAB: false,
+      inputRAB: false,
     };
   },
   validations: {
@@ -907,65 +1006,97 @@ export default {
     ]),
     load() {
       if (this.$route.params.id) {
-        this.button = false;
-        this.option = false;
-        // console.log(this.status[index - 1].status ); // untuk mengecek pengajuan sebelumnya
-        // jika user login == atasan && status belum diterima && status sebelumnya diterima maka option true
-        for (let index = 1; index < this.status.length; index++) {
+        if (!this.status.isNewFormat) {
+          this.button = false;
+          this.option = false;
+          // console.log(this.status.data[index - 1].status ); // untuk mengecek pengajuan sebelumnya
+          // jika user login == atasan && status belum diterima && status sebelumnya diterima maka option true
+          for (let index = 1; index < this.status.data.length; index++) {
+            if (
+              this.status.data[index].id_user == this.userLogin &&
+              this.status.data[index].status == false &&
+              this.status.data[index - 1].status !== false &&
+              this.status.data[index + 1].id_user !== 1111
+            ) {
+              this.option = true;
+            }
+          }
+          // jika dir keuangan maka upload pencairan
           if (
-            this.status[index].id_user == this.userLogin &&
-            this.status[index].status == false &&
-            this.status[index - 1].status !== false &&
-            this.status[index + 1].id_user !== 1111
+            // this.userLogin == 24 && // ubah kesini jika keuangan yg lakukan pencairan
+            this.userLogin == 120 &&
+            this.status.data[this.status.data.length - 4].status &&
+            this.status.data[this.status.data.length - 3].status == false
           ) {
+            this.form.lpj_keuangan && this.form.lpj_kegiatan
+              ? (this.formPencairan = false)
+              : ((this.formPencairan = true), (this.option = false));
+          }
+          // jika user login == pengaju && sudah pencairan maka formLPJ true
+          if (
+            this.status.data[0].id_user == this.userLogin &&
+            this.status.data[this.status.data.length - 3].status &&
+            this.status.data[this.status.data.length - 2].lpj[0].status == false
+          ) {
+            this.formLPJKeuangan = true;
+            this.option = false;
+          }
+          if (
+            this.status.data[0].id_user == this.userLogin &&
+            this.status.data[this.status.data.length - 3].status &&
+            this.status.data[this.status.data.length - 2].lpj[0].status &&
+            this.status.data[this.status.data.length - 2].lpj[1].status == false
+          ) {
+            this.formLPJKegiatan = true;
+            this.option = false;
+          }
+          // jika sekniv/dir keuangan maka tampilkan form terima/tolak lpj
+          if (
+            // (this.userLogin == 24 && // ubah kesini jika keuangan yg lakukan pencairan
+            (this.userLogin == 121 &&
+              this.forms.lpj_keuangan &&
+              this.status.data[this.status.data.length - 2].lpj[0].status ==
+                false) ||
+            (this.userLogin == 21 &&
+              this.forms.lpj_kegiatan &&
+              this.status.data[this.status.data.length - 2].lpj[1].status ==
+                false)
+          ) {
+            this.terimaLPJ = 4;
             this.option = true;
           }
+        } else {
+          this.button = false;
+          this.option = false;
+
+          this.status.data.forEach((item, index) => {
+            if (
+              item.id_user == this.userLogin &&
+              item.status == false &&
+              this.status.data[index - 1].status !== false &&
+              this.status.data[index + 1].id_user !== 1111
+            ) {
+              this.option = true;
+            }
+          });
+
+          if (
+            this.status.data[0].id_user == this.userLogin &&
+            this.status.data[this.status.data.length - 3].status &&
+            this.status.data[this.status.data.length - 2].status == false
+          ) {
+            this.formLPJ1Format = true;
+            this.option = false;
+          }
         }
-        // jika dir keuangan maka upload pencairan
-        if (
-          // this.userLogin == 24 && // ubah kesini jika keuangan yg lakukan pencairan
-          this.userLogin == 120 &&
-          this.status[this.status.length - 4].status &&
-          this.status[this.status.length - 3].status == false
-        ) {
-          this.form.lpj_keuangan && this.form.lpj_kegiatan
-            ? (this.formPencairan = false)
-            : ((this.formPencairan = true), (this.option = false));
-        }
-        // jika user login == pengaju && sudah pencairan maka formLPJ true
-        if (
-          this.status[0].id_user == this.userLogin &&
-          this.status[this.status.length - 3].status &&
-          this.status[this.status.length - 2].lpj[0].status == false
-        ) {
-          this.formLPJKeuangan = true;
+
+        // jika user adalah dir keuangan maka tidak bisa terima/revisi karena hanya bisa add to list
+        if (+this.userLogin === 24) {
           this.option = false;
         }
+
         if (
-          this.status[0].id_user == this.userLogin &&
-          this.status[this.status.length - 3].status &&
-          this.status[this.status.length - 2].lpj[0].status &&
-          this.status[this.status.length - 2].lpj[1].status == false
-        ) {
-          this.formLPJKegiatan = true;
-          this.option = false;
-        }
-        // jika sekniv/dir keuangan maka tampilkan form terima/tolak lpj
-        if (
-          // (this.userLogin == 24 && // ubah kesini jika keuangan yg lakukan pencairan
-          (this.userLogin == 121 &&
-            this.forms.lpj_keuangan &&
-            this.status[this.status.length - 2].lpj[0].status == false) ||
-          (this.userLogin == 21 &&
-            this.forms.lpj_kegiatan &&
-            this.status[this.status.length - 2].lpj[1].status == false)
-        ) {
-          this.terimaLPJ = 4;
-          this.option = true;
-        }
-        // jika user login == pengaju dan dihalaman suboridnate maka button true
-        if (
-          this.status[0].id_user == this.userLogin &&
+          this.status.data[0].id_user == this.userLogin &&
           this.$route.name == "pengajuan-subordinate-edit-id"
         ) {
           this.$axios
@@ -984,13 +1115,19 @@ export default {
       // this.form.biaya_program = this.form.biaya_program.replaceAll(".", "");
     },
     downloadFile() {
-      window.open("https://aperkat.uts.ac.id/api/public/draftfile/RABTemplate2022.xlsx");
+      window.open(
+        "https://aperkat.uts.ac.id/api/public/draftfile/RABTemplate2022.xlsx"
+      );
     },
     satuanHarga() {
-      window.open(`https://aperkat.uts.ac.id/api/public/draftfile/satuan_harga.xlsx`);
+      window.open(
+        `https://aperkat.uts.ac.id/api/public/draftfile/satuan_harga.xlsx`
+      );
     },
     draftLaporanKeuangan() {
-      window.open(`https://aperkat.uts.ac.id/api/public/draftfile/laporan-keuangan.docx`);
+      window.open(
+        `https://aperkat.uts.ac.id/api/public/draftfile/laporan-keuangan.docx`
+      );
     },
     getIku1(value) {
       if (value) {
@@ -1040,71 +1177,71 @@ export default {
         this.id_iku_child2 = res.data.data.label;
       });
     },
+    toggleInputRAB() {
+      if (this.uploadRAB) this.uploadRAB = false;
+      this.inputRAB = !this.inputRAB;
+    },
+    toggleUploadRAB() {
+      if (this.inputRAB) this.inputRAB = false;
+      this.uploadRAB = !this.uploadRAB;
+    },
     async submit() {
       this.$v.$touch();
       if (this.$v.$invalid) {
         this.failed("Pastikan semua fields diisi!");
       } else {
         this.loader("Saving pengajuan");
-        if (this.$route.name === "pengajuan-subordinate-edit-id") {
-          this.replace();
-          this.form.nama_status = await this.$store.state.auth.user[0].fullname;
-          this.form.status_validasi = 1;
+        this.replace();
 
-          this.$axios
-            .post(
-              `/pengajuan/${this.$route.params.id}`,
-              Object.assign(
-                {
-                  id: this.$route.params.id,
-                  message: "Update pengajuan",
-                  id_struktur: this.form.id_user,
-                },
-                this.form
-              )
-            )
-            .then(async () => {
-              await this.postRAB(this.$route.params.id);
-              this.success("Data telah disimpan!");
-              // this.$nuxt.refresh();
-              window.location.reload();
-            })
-            .catch((error) => {
-              if (error.response) {
-                this.failed(error.response.data.message);
-              }
-            });
-        } else {
-          // this.replace();
-          let nama_status = await this.$store.state.auth.user[0].fullname;
-          this.$axios
-            .post(
-              "/pengajuan",
-              Object.assign(
-                {
-                  id_struktur: this.userLogin,
-                  status_validasi: 1,
-                  message: "Input pengajuan",
-                  nama_status: nama_status,
-                  next: null,
-                },
-                this.form
-              )
-            )
-            .then(async (response) => {
-              await this.postRAB(response.data.id_pengajuan);
-              this.success("Data telah disimpan!");
-              this.$router.push(this.redirects);
-            })
-            .catch((error) => {
-              if (error.response) {
-                this.failed(error.response.data.message);
-              }
-            });
+        try {
+          if (this.$route.name === "pengajuan-subordinate-edit-id") {
+            const data = Object.assign(
+              {
+                id: this.$route.params.id,
+                status_validasi: 1,
+                message: "Update pengajuan",
+                id_struktur: this.form.id_user,
+                nama_status: this.$store.state.auth.user[0].fullname,
+              },
+              this.form
+            );
+            await this.$axios.post(`/pengajuan/${this.$route.params.id}`, data);
+            await this.postRAB(this.$route.params.id);
+            this.success("Data telah disimpan!");
+            window.location.reload();
+          } else {
+            const data = Object.assign(
+              {
+                id_struktur: this.userLogin,
+                status_validasi: 1,
+                message: "Input pengajuan",
+                nama_status: this.$store.state.auth.user[0].fullname,
+                next: null,
+              },
+              this.form
+            );
+            const res = await this.$axios.post("/pengajuan", data);
+            await this.postRAB(res.data.id_pengajuan);
+            this.success("Data telah disimpan!");
+            this.$router.push(this.redirects);
+          }
+        } catch (error) {
+          let message = "";
+          if (error.response) {
+            message =
+              error.response.data && error.response.data.message
+                ? error.response.data.message
+                : error.response.data;
+          } else if (error.request) {
+            message = error.request;
+          } else {
+            message = error.message;
+          }
+          this.failed(message);
         }
       }
     },
-    terima() {
+    async terima() {
       this.$swal({
         title: "Warning!",
         text: "Setujui pengajuan ini?",
@@ -1114,59 +1251,62 @@ export default {
         confirmButtonColor: "#d33",
         cancelButtonColor: "#3085d6",
         confirmButtonText: "OK",
-      }).then((result) => {
+      }).then(async (result) => {
         if (result.isConfirmed) {
-          for (let index = 1; index < this.status.length; index++) {
+          for (let index = 1; index < this.status.data.length; index++) {
             if (
-              this.status[index].id_user == this.userLogin &&
-              this.status[index - 1].status !== false
+              this.status.data[index].id_user == this.userLogin &&
+              this.status.data[index - 1].status !== false
             ) {
-              this.next = this.status[index + 1].id_user;
+              this.next = this.status.data[index + 1].id_user;
             }
           }
           if (this.terimaLPJ == 4) {
             if (
-              this.status[this.status.length - 2].lpj[0].status == false &&
-              this.status[this.status.length - 2].lpj[1].status == false
+              this.status.data[this.status.data.length - 2].lpj[0].status ==
+                false &&
+              this.status.data[this.status.data.length - 2].lpj[1].status ==
+                false
             ) {
               this.next = 21;
             } else if (
-              this.status[this.status.length - 2].lpj[0].status !== false &&
-              this.status[this.status.length - 2].lpj[1].status == false
+              this.status.data[this.status.data.length - 2].lpj[0].status !==
+                false &&
+              this.status.data[this.status.data.length - 2].lpj[1].status ==
+                false
             ) {
               this.next = 3333;
             }
           }
-          this.loader("loading...");
-          // this.replace();
-          this.approved({
-            id: this.$route.params.id,
-            message: this.message,
-            status_validasi: this.terimaLPJ ? this.terimaLPJ : 2,
-            id_user: this.form.id_user,
-            id_struktur:
-              this.terimaLPJ && this.userLogin == 121 ? 24 : this.userLogin,
-            nama_status:
-              this.terimaLPJ && this.userLogin == 121
-                ? "Direktur Keuangan"
-                : this.$store.state.auth.user[0].fullname,
-            next: this.terimaLPJ && this.userLogin == 121 ? 21 : this.next,
-          })
-            .then(() => {
-              this.success("Berhasil terima pengajuan");
-              this.option = false;
-              this.$nuxt.refresh();
-              if (this.form.lpj_keuangan && this.form.lpj_kegiatan)
-                this.formLPJKeuangan = false;
-              this.formLPJKegiatan = false;
-            })
-            .catch(() => {
-              this.failed("Whoops Server Error");
+          try {
+            this.loader("loading...");
+            this.replace();
+            await this.approved({
+              id: this.$route.params.id,
+              message: this.message,
+              status_validasi: this.terimaLPJ ? this.terimaLPJ : 2,
+              id_user: this.form.id_user,
+              id_struktur:
+                this.terimaLPJ && this.userLogin == 121 ? 24 : this.userLogin,
+              nama_status:
+                this.terimaLPJ && this.userLogin == 121
+                  ? "Direktur Keuangan"
+                  : this.$store.state.auth.user[0].fullname,
+              next: this.terimaLPJ && this.userLogin == 121 ? 21 : this.next,
             });
+            this.success("Berhasil terima pengajuan");
+            this.option = false;
+            this.$nuxt.refresh();
+            if (this.form.lpj_keuangan && this.form.lpj_kegiatan)
+              this.formLPJKeuangan = false;
+            this.formLPJKegiatan = false;
+          } catch (error) {
+            this.failed("Whoops! gagal aksi terima pengajuan");
+          }
         }
       });
     },
-    tolak() {
+    async tolak() {
       this.$swal({
         title: "Warning!",
         text: "Tolak pengajuan ini?",
@@ -1176,71 +1316,63 @@ export default {
         confirmButtonColor: "#d33",
         cancelButtonColor: "#3085d6",
         confirmButtonText: "OK",
-      }).then((result) => {
+      }).then(async (result) => {
         if (result.isConfirmed) {
-          this.loader("loading...");
-          this.replace();
-          this.declined({
-            id: this.$route.params.id,
-            message: this.message,
-            status_validasi: 0,
-            id_struktur: this.userLogin,
-            nama_status: this.$store.state.auth.user[0].fullname,
-            next: this.userLogin,
-          })
-            .then(() => {
-              this.success("Berhasil tolak pengajuan");
-              this.option = true;
-              this.$nuxt.refresh();
-              if (this.form.lpj_keuangan && this.form.lpj_kegiatan)
-                this.formLPJKeuangan = false;
-              this.formLPJKegiatan = false;
-            })
-            .catch(() => {
-              this.failed("Whoops Server Error");
-            });
+          try {
+            this.loader("loading...");
+            this.replace();
+            const data = {
+              id: this.$route.params.id,
+              message: this.message,
+              status_validasi: 0,
+              id_struktur: this.userLogin,
+              nama_status: this.$store.state.auth.user[0].fullname,
+              next: this.userLogin,
+            };
+            await this.$axios.post(
+              `/pengajuan/${this.$route.params.id}/decline`,
+              data
+            );
+            this.success("Berhasil tolak pengajuan");
+            this.option = false;
+            this.$nuxt.refresh();
+            if (this.form.lpj_keuangan && this.form.lpj_kegiatan)
+              this.formLPJKeuangan = false;
+            this.formLPJKegiatan = false;
+          } catch (error) {
+            this.failed("Whoops! gagal aksi revisi pengajuan");
+          }
         }
       });
     },
     // Fungsi upload file pencairan
     async buktiTF() {
-      if (
-        this.pencairan !== null &&
-        this.pencairan.length !== 0 &&
-        this.pencairanNominal !== "" &&
-        this.pencairanNominal !== null
-      ) {
+      if (!this.pencairan && !this.pencairanNominal) {
         const status = this.checkFileSize(this.pencairan.size);
         if (status) {
-          this.loader("loading...");
-          const form = new FormData();
-          form.append("file", this.pencairan);
-
           try {
-            await this.$axios.post("/pengajuan/upload", form).then((res) => {
+            this.loader("loading...");
+            const form = new FormData();
+            form.append("file", this.pencairan);
+            const res = await this.$axios.post("/pengajuan/upload", form);
+            if (res.data) {
               this.buktiTFImage = res.data;
-              // axios post pencairan image
-              if (this.buktiTFImage) {
-                this.$axios
-                  .post(`/pencairan`, {
-                    pengajuan_id: this.$route.params.id,
-                    nominal: this.pencairanNominal.replaceAll(".", ""),
-                    images: this.buktiTFImage,
-                  })
-                  .then((res) => {
-                    this.success("Berhasil upload bukti pencairan");
-                    window.location.reload();
-                  })
-                  .catch((err) => {
-                    this.failed("Whoops Server Error");
-                  });
-              } else {
-                this.failed("Upload ulang file");
-              }
-            });
+              const data = {
+                pengajuan_id: this.$route.params.id,
+                nominal: this.pencairanNominal.replaceAll(".", ""),
+                images: this.buktiTFImage,
+              };
+              await this.$axios.post(`/pencairan`, data);
+              this.success("Berhasil upload bukti pencairan");
+              window.location.reload();
+            } else {
+              this.failed("Whoops! gagal upload bukti pencairan");
+            }
           } catch (e) {
-            console.log("Whoops Server Error");
+            console.log("Whoops! gagal upload bukti pencairan");
           }
+        } else {
+          this.failed("Ukuran file terlalu besar");
         }
       } else {
         this.failed("Pilih file dan input nominal");
@@ -1260,31 +1392,68 @@ export default {
         confirmButtonColor: "#d33",
         cancelButtonColor: "#3085d6",
         confirmButtonText: "OK",
-      }).then((result) => {
+      }).then(async (result) => {
         if (result.isConfirmed) {
-          this.loader("loading...");
-          this.replace();
-          this.approved({
-            id: this.$route.params.id,
-            message: "Pencairan selesai",
-            status_validasi: 3,
-            id_struktur: 24,
-            next: 24,
-            nama_status: "Direktur Keuangan",
-            pencairan: "default.jpg",
-          })
-            .then(() => {
-              this.success("Upload bukti pencairan selesai");
-              this.formPencairan = false;
-              this.$nuxt.refresh();
-            })
-            .catch(() => {
-              this.failed("Whoops Server Error");
-            });
+          try {
+            this.loader("loading...");
+            this.replace();
+            const data = {
+              id: this.$route.params.id,
+              message: "Pencairan selesai",
+              status_validasi: 3,
+              id_struktur: 24,
+              next: 24,
+              nama_status: "Direktur Keuangan",
+              pencairan: "default.jpg",
+            };
+            await this.approved(data);
+            this.success("Upload bukti pencairan selesai");
+            this.formPencairan = false;
+            this.$nuxt.refresh();
+          } catch (error) {
+            this.failed("Gagal upload bukti pencairan");
+          }
         }
       });
     },
-    uploadLPJKeuangan() {
+    async uploadLPJNewFormat() {
+      if (this.file1.length != 0) {
+        const form = new FormData();
+        form.append("file", this.file1);
+
+        let status = this.checkFileSize(this.file1.size);
+        if (status) {
+          try {
+            this.loader("Uploading...");
+            const res = await this.$axios.post("/pengajuan/upload", form);
+            if (res.data) {
+              this.form.lpj_keuangan = res.data;
+              this.replace();
+              await this.updatepengajuan({
+                next: 24,
+                status_validasi: 1,
+                id: this.$route.params.id,
+                message: "Upload LPJ (Keuangan dan Kegiatan)",
+                lpj_keuangan: this.form.lpj_keuangan,
+                id_struktur: this.userLogin,
+                nama_status: this.$store.state.auth.user[0].fullname,
+              });
+              this.success("Data telah disimpan!");
+              this.$nuxt.refresh();
+            } else {
+              this.failed("Whoops! gagal upload LPJ");
+            }
+          } catch (e) {
+            this.failed("Whoops! gagal upload LPJ");
+          }
+        } else {
+          this.failed("Ukuran file terlalu besar");
+        }
+      } else {
+        this.failed("Select file");
+      }
+    },
+    async uploadLPJKeuangan() {
       if (this.LPJKeuangan.length != 0) {
         const form = new FormData();
         form.append("file", this.LPJKeuangan);
@@ -1292,11 +1461,12 @@ export default {
         let status = this.checkFileSize(this.LPJKeuangan.size);
         if (status) {
           try {
-            this.$axios.post("/pengajuan/upload", form).then((res) => {
+            this.loader("Uploading...");
+            const res = await this.$axios.post("/pengajuan/upload", form);
+            if (res.data) {
               this.form.lpj_keuangan = res.data;
-              this.loader("Uploading...");
               this.replace();
-              this.updatepengajuan({
+              await this.updatepengajuan({
                 next: 24,
                 status_validasi: 1,
                 id: this.$route.params.id,
@@ -1304,24 +1474,23 @@ export default {
                 lpj_keuangan: this.form.lpj_keuangan,
                 id_struktur: this.userLogin,
                 nama_status: this.$store.state.auth.user[0].fullname,
-              })
-                .then(() => {
-                  this.success("Data telah disimpan!");
-                  this.$nuxt.refresh();
-                })
-                .catch(() => {
-                  this.failed("Whoops Server Error");
-                });
-            });
+              });
+              this.success("Data telah disimpan!");
+              this.$nuxt.refresh();
+            } else {
+              this.failed("Whoops! gagal upload LPJ keuangan");
+            }
           } catch (e) {
-            this.failed("Whoops Server Error");
+            this.failed("Whoops! gagal upload LPJ keuangan");
           }
+        } else {
+          this.failed("Ukuran file terlalu besar");
         }
       } else {
         this.failed("Select file");
       }
     },
-    uploadLPJKegiatan() {
+    async uploadLPJKegiatan() {
       if (this.LPJKegiatan.length != 0) {
         const form = new FormData();
         form.append("file", this.LPJKegiatan);
@@ -1329,11 +1498,12 @@ export default {
         let status = this.checkFileSize(this.LPJKegiatan.size);
         if (status) {
           try {
-            this.$axios.post("/pengajuan/upload", form).then((res) => {
+            this.loader("Uploading...");
+            const res = await this.$axios.post("/pengajuan/upload", form);
+            if (res.data) {
               this.form.lpj_kegiatan = res.data;
-              this.loader("Uploading...");
               this.replace();
-              this.updatepengajuan({
+              await this.updatepengajuan({
                 next: 21,
                 status_validasi: 1,
                 id: this.$route.params.id,
@@ -1341,24 +1511,23 @@ export default {
                 lpj_kegiatan: this.form.lpj_kegiatan,
                 id_struktur: this.userLogin,
                 nama_status: this.$store.state.auth.user[0].fullname,
-              })
-                .then(() => {
-                  this.success("Data telah disimpan!");
-                  this.$nuxt.refresh();
-                })
-                .catch(() => {
-                  this.failed("Whoops Server Error");
-                });
-            });
+              });
+              this.success("Data telah disimpan!");
+              this.$nuxt.refresh();
+            } else {
+              this.failed("Whoops! gagal upload LPJ kegiatan");
+            }
           } catch (e) {
-            this.failed("Whoops Server Error");
+            this.failed("Whoops! gagal upload LPJ kegiatan");
           }
+        } else {
+          this.failed("Ukuran file terlalu besar");
         }
       } else {
-        this.failed("Select file");
+        this.failed("Pilih file LPJ Kegiatan");
       }
     },
-    undo() {
+    async undo() {
       this.$swal({
         title: "Warning!",
         text: "Tolak pengajuan ini?",
@@ -1368,52 +1537,51 @@ export default {
         confirmButtonColor: "#d33",
         cancelButtonColor: "#3085d6",
         confirmButtonText: "OK",
-      }).then((result) => {
+      }).then(async (result) => {
         if (result.isConfirmed) {
-          this.loader("loading...");
-          this.replace();
-          this.declined({
-            id: this.$route.params.id,
-            message: this.message,
-            status_validasi: 0,
-            id_struktur: this.userLogin,
-            nama_status: this.$store.state.auth.user[0].fullname,
-            next: this.userLogin,
-          })
-            .then(() => {
-              this.success("Berhasil tolak pengajuan");
-              this.option = true;
-              this.$nuxt.refresh();
-              if (this.form.lpj_keuangan && this.form.lpj_kegiatan)
-                this.formLPJKeuangan = false;
-              this.formLPJKegiatan = false;
-            })
-            .catch(() => {
-              this.failed("Whoops Server Error");
+          try {
+            this.loader("loading...");
+            this.replace();
+            await this.declined({
+              id: this.$route.params.id,
+              message: this.message,
+              status_validasi: 0,
+              id_struktur: this.userLogin,
+              nama_status: this.$store.state.auth.user[0].fullname,
+              next: this.userLogin,
             });
+            this.success("Berhasil tolak pengajuan");
+            this.option = true;
+            this.$nuxt.refresh();
+            if (this.form.lpj_keuangan && this.form.lpj_kegiatan) {
+              this.formLPJKeuangan = false;
+              this.formLPJKegiatan = false;
+            }
+          } catch (error) {
+            this.failed("Whoops! gagal undo aksi");
+          }
         }
       });
     },
     // check file size
     checkFileSize(size) {
-      let hasil = false;
+      let result = true;
       if (size > 2097152) {
         this.failed("Ukuran file max 2MB");
-        hasil = false;
-      } else {
-        hasil = true;
+        result = false;
       }
-      return hasil;
+      return result;
     },
-    print() {
-      this.$axios
-        .post("/pengajuan/pdfByUSer/" + this.userLogin, this.$route.params.id)
-        .then(() => {
-          // window.open("http://localhost:8000/g/" + btoa(this.userLogin));
-          window.open(
-            "https://aperkat.uts.ac.id/api/g/" + btoa(this.userLogin)
-          );
-        });
+    async print() {
+      try {
+        await this.$axios.post(
+          "/pengajuan/pdfByUSer/" + this.userLogin,
+          this.$route.params.id
+        );
+        window.open("https://aperkat.uts.ac.id/api/g/" + btoa(this.userLogin));
+      } catch (error) {
+        this.failed("Whoops! gagal unduh dokumen");
+      }
     },
     getDataRKAT(value) {
       if (value) {
@@ -1431,68 +1599,60 @@ export default {
       const form = new FormData();
       form.append("file", this.file);
       try {
-        await this.$axios.post("/pengajuan/importRAB", form).then((res) => {
-          for (let index = 0; index < res.data.data.length; index++) {
-            this.push({
-              no: res.data.data[index].no,
-              jenis_barang: res.data.data[index].jenis_barang,
-              harga_satuan: res.data.data[index].harga_satuan,
-              qty: res.data.data[index].qty,
-              total:
-                res.data.data[index].harga_satuan * res.data.data[index].qty,
-              keterangan: res.data.data[index].keterangan,
-            });
-          }
+        const res = await this.$axios.post("/pengajuan/importRAB", form);
+        res.data.data.forEach((element) => {
+          this.push({
+            no: element.no,
+            jenis_barang: element.jenis_barang,
+            harga_satuan: element.harga_satuan,
+            qty: element.qty,
+            total: element.harga_satuan * element.qty,
+            keterangan: element.keterangan,
+          });
         });
       } catch (e) {
-        this.failed("Whoops! Pastikan file yang diupload sesuai dengan format.");
+        this.failed(
+          "Whoops! Pastikan file yang diupload sesuai dengan format."
+        );
       }
     },
     async postRAB(params) {
-      this.items.forEach((item) => {
-        delete item.no;
-        item.pengajuan_id = params;
-      });
-      await this.$axios
-        .post(`/rab`, this.items)
-        .then((res) => {
-          // console.log(res);
-        })
-        .catch((e) => {
-          // console.log(e);
+      try {
+        this.items.forEach((item) => {
+          delete item.no;
+          item.pengajuan_id = params;
         });
+        await this.$axios.post(`/rab`, this.items);
+      } catch (error) {
+        this.failed("Gagal menambahkan data RAB");
+      }
     },
     async getRAB(params) {
-      await this.$axios
-        .get(`/rab/${params}`)
-        .then((res) => {
-          for (let index = 0; index < res.data.length; index++) {
+      try {
+        const res = await this.$axios.get(`/rab/${params}`);
+        if (res.data.length > 0) {
+          res.data.forEach((element) => {
             this.push({
               no: Math.floor(Math.random() * 1000),
-              jenis_barang: res.data[index].jenis_barang,
-              harga_satuan: Number(res.data[index].harga_satuan),
-              qty: Number(res.data[index].qty),
-              total:
-                Number(res.data[index].harga_satuan) *
-                Number(res.data[index].qty),
-              keterangan: res.data[index].keterangan,
+              jenis_barang: element.jenis_barang,
+              harga_satuan: Number(element.harga_satuan),
+              qty: Number(element.qty),
+              total: Number(element.harga_satuan) * Number(element.qty),
+              keterangan: element.keterangan,
             });
-          }
-        })
-        .catch((e) => {
-          console.log(e);
-        });
+          });
+        }
+      } catch (error) {
+        this.failed("Whoops! gagal mendapatkan data RAB");
+      }
     },
     numberFormatHargaSatuan() {
       this.harga_satuan = this.$formatRupiah(this.harga_satuan);
     },
     sum() {
-      let totalSum = 0;
-      for (let index = 0; index < this.items.length; index++) {
-        totalSum += Number(
-          this.items[index].qty * this.items[index].harga_satuan
-        );
-      }
+      let totalSum = this.items.reduce((acc, item) => {
+        return acc + Number(item.qty * item.harga_satuan);
+      }, 0);
       this.form.biaya_program = totalSum;
     },
     push({ no, jenis_barang, harga_satuan, qty, total, keterangan }) {
@@ -1506,6 +1666,10 @@ export default {
           keterangan: keterangan,
         });
         this.sum();
+        this.nama_barang = "";
+        this.harga_satuan = "";
+        this.qty = "";
+        this.ket = "";
       }
     },
     addRAB() {
@@ -1519,10 +1683,6 @@ export default {
         ),
         keterangan: this.ket,
       });
-      (this.nama_barang = ""),
-        (this.harga_satuan = ""),
-        (this.qty = ""),
-        (this.ket = "");
     },
     hapus(params) {
       let data = this.items.filter((i) => i.no !== params);
@@ -1569,6 +1729,10 @@ export default {
 </script>
 
 <style>
+.custom-style > * {
+  display: block !important;
+}
+
 /* Timeline */
 .container-timeline {
   position: relative;

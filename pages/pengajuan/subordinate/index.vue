@@ -49,7 +49,7 @@
             <template v-slot:actions="row">
               <NuxtLink
                 class="btn btn-sm btn-outline-info mt-1"
-                :to="'edit/' + row.item.id_pengajuan"
+                :to="'/pengajuan/subordinate/edit/' + row.item.id_pengajuan"
                 :key="'edit' + row.index"
                 >Detail</NuxtLink
               >
@@ -71,6 +71,7 @@
 import { mapActions, mapState } from "vuex";
 
 export default {
+  middleware: ["pages/pengajuan"],
   async asyncData({ store }) {
     await Promise.all([
       store.dispatch(
@@ -156,7 +157,7 @@ export default {
       if (!item || type !== "row") return;
       if (item.status_message === 0) return "table-success";
     },
-    destroypengajuan(row) {
+    async destroypengajuan(row) {
       this.$swal({
         title: "Warning!",
         text: "Yakin menghapus pengajuan?",
@@ -166,30 +167,29 @@ export default {
         confirmButtonColor: "#d33",
         cancelButtonColor: "#3085d6",
         confirmButtonText: "OK, Hapus!",
-      }).then((result) => {
+      }).then(async (result) => {
         if (result.isConfirmed) {
-          this.deletepengajuan(row.item.id_pengajuan)
-            .then(() => {
-              this.$swal({
-                width: 300,
-                icon: "success",
-                title: "Congrats!",
-                text: "Data telah dihapus",
-              });
-              this.reload();
-            })
-            .catch(() => {
-              this.$swal({
-                width: 300,
-                icon: "error",
-                title: "Oops...",
-                text: "Server error atau cek koneksi anda",
-              });
+          try {
+            await this.deletepengajuan(row.item.id_pengajuan);
+            this.$swal({
+              width: 300,
+              icon: "success",
+              title: "Congrats!",
+              text: "Data telah dihapus",
             });
+            this.reload();
+          } catch (error) {
+            this.$swal({
+              width: 300,
+              icon: "error",
+              title: "Oops...",
+              text: "Whoops! gagal delete pengajuan",
+            });
+          }
         }
       });
     },
-    deleteAll() {
+    async deleteAll() {
       this.$swal({
         title: "Warning!",
         text: "Hapus semua pengajuan?",
@@ -199,27 +199,27 @@ export default {
         confirmButtonColor: "#d33",
         cancelButtonColor: "#3085d6",
         confirmButtonText: "OK!",
-      }).then((result) => {
+      }).then(async (result) => {
         if (result.isConfirmed) {
-          this.$axios
-            .get(`/pengajuan/destroy/${this.$store.state.auth.user[0].id_user}`)
-            .then(async () => {
-              await this.$swal({
-                width: 300,
-                icon: "success",
-                title: "Congrats!",
-                text: "Semua pengajuan telah dihapus",
-              });
-              await this.reload();
-            })
-            .catch(() => {
-              this.$swal({
-                width: 300,
-                icon: "error",
-                title: "Oops...",
-                text: "Cek server atau koneksi anda",
-              });
+          try {
+            await this.$axios.get(
+              `/pengajuan/destroy/${this.$store.state.auth.user[0].id_user}`
+            );
+            this.$swal({
+              width: 300,
+              icon: "success",
+              title: "Congrats!",
+              text: "Semua pengajuan telah dihapus",
             });
+            this.reload();
+          } catch (error) {
+            this.$swal({
+              width: 300,
+              icon: "error",
+              title: "Oops...",
+              text: "Whoops! gagal reset pengajuan",
+            });
+          }
         }
       });
     },
@@ -237,7 +237,7 @@ export default {
           );
         });
     },
-    deleteRows(params) {
+    async deleteRows(params) {
       this.$swal({
         title: "Warning!",
         text: "Yakin menghapus pengajuan terpilih?",
@@ -247,27 +247,24 @@ export default {
         confirmButtonColor: "#d33",
         cancelButtonColor: "#3085d6",
         confirmButtonText: "OK",
-      }).then((result) => {
+      }).then(async (result) => {
         if (result.isConfirmed) {
-          this.$axios
-            .post("/pengajuan/deleteRows", params)
-            .then(async () => {
-              await this.$swal({
-                width: 300,
-                icon: "success",
-                title: "Congrats!",
-                text: "Pengajuan telah dihapus",
-              });
-              await this.reload();
-            })
-            .catch(() => {
-              this.$swal({
-                width: 300,
-                icon: "error",
-                title: "Oops...",
-                text: "Please check your server or internet connection",
-              });
+          try {
+            await this.$axios.post("/pengajuan/deleteRows", params);
+            this.$swal({
+              width: 300,
+              icon: "success",
+              title: "Congrats!",
+              text: "Pengajuan telah dihapus",
             });
+          } catch (error) {
+            this.$swal({
+              width: 300,
+              icon: "error",
+              title: "Oops...",
+              text: "Please check your server or internet connection",
+            });
+          }
         }
       });
     },
