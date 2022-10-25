@@ -1,5 +1,7 @@
 // const url = process.env.IS_DEV ? process.env.DEV_URL : process.env.PROD_URL;
-const url = "https://aperkat.uts.ac.id/api";
+const isDev = false;
+const url = isDev ? "http://127.0.0.1:8000" : "https://aperkat.uts.ac.id/api";
+
 export default {
   ssr: true,
   target: "static",
@@ -38,6 +40,7 @@ export default {
     "@/plugins/numeral.js",
     "@/plugins/vuelidate.js",
     "@/plugins/custom-middleware.js",
+    { src: "~/plugins/chart.js", mode: "client" },
     // "@nuxtjs/proxy",
     // {src: '~/plugins/vue-list-picker.js', mode: 'client'},
   ],

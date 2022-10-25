@@ -105,9 +105,7 @@ export default {
     async logout() {
       try {
         await this.$auth.logout();
-        // this.SET_IS_AUTH(false);
-        // this.$router.push("/login");
-        window.location.href = "/login";
+        window.location.href = "/";
       } catch (err) {
         console.log(err);
       }
@@ -119,5 +117,4 @@ export default {
 };
 </script>
 
-<style>
-</style>
+<style></style>

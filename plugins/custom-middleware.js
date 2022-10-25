@@ -25,12 +25,12 @@ export default ({ app, route, store }, inject) => {
     return route.params.id;
   });
 
-  inject("isYourSubmission", async () => {
-    if (!route.params && route.params.id) throw new Error("Id is required");
-    const { data } = await app.$axios.get(`/pengajuan/${route.params.id}`);
-    if (!data.data) return false;
-    const { id_user: pengajuanIdUser } = data.data;
-    return pengajuanIdUser === store.state.auth.user[0].id_user ? true : false;
+  inject("isYourRKAT", async (id) => {
+    if (!id) throw new Error("Id is required");
+    const { data } = await app.$axios.get(
+      `/rkat/checkIfHasAccess/${id}/${app.$user().id_user}`
+    );
+    return data;
   });
 
   inject("isHasAccess", async (id = null) => {

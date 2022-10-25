@@ -6,7 +6,7 @@
 </template>
 <script>
 import { mapActions, mapState } from "vuex";
-import pencairanLpjKeuangan from '../components/pencairanLpjKeuangan.vue';
+import pencairanLpjKeuangan from "../components/pencairanLpjKeuangan.vue";
 
 export default {
   components: { pencairanLpjKeuangan },
@@ -22,7 +22,19 @@ export default {
   data() {
     return {
       userLogin: this.$store.state.auth.user[0].id_user,
-      options: {},
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          yAxes: [
+            {
+              ticks: {
+                beginAtZero: false,
+              },
+            },
+          ],
+        },
+      },
       chartData: {},
       keyRKAT: "id_rkat",
       fields: [
@@ -52,20 +64,6 @@ export default {
     }),
   },
   mounted() {
-    this.options = {
-      responsive: true,
-      maintainAspectRatio: false,
-      scales: {
-        yAxes: [
-          {
-            ticks: {
-              beginAtZero: false,
-            },
-          },
-        ],
-      },
-    };
-
     this.chartData = {
       labels: ["Kas", "Kredit"],
       datasets: [

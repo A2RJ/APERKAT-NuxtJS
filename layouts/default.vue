@@ -59,11 +59,6 @@ export default {
     Footer: Footer,
   },
   mounted() {
-    if (!this.$store.state.auth.loggedIn) {
-      if (this.$route.path !== "/login") {
-        window.location.href = "/login";
-      }
-    }
     !(function (t) {
       "use strict";
       t("#sidebarToggle, #sidebarToggleTop").on("click", function (o) {

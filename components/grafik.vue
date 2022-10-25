@@ -64,8 +64,10 @@
       </div>
     </div>
     <div class="col-lg-4 card">
-      <chart ref="skills_chart" :chart-data="chartData" :options="options">
-      </chart>
+      <!-- <chart :data="chartData" :options="options"> </chart> -->
+      <client-only>
+        <doughnut-chart :data="chartData"></doughnut-chart>
+      </client-only>
     </div>
     <div class="col-lg-12 card mt-2">
       <div class="mt-2 m-1">
@@ -289,6 +291,12 @@ export default {
   },
   methods: {
     ...mapActions("subordinate", ["getGrafik"]),
+    idrFormat(number) {
+      return new Intl.NumberFormat("id-ID", {
+        style: "currency",
+        currency: "IDR",
+      }).format(number);
+    },
   },
 };
 </script>

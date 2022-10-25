@@ -177,15 +177,7 @@ export default {
       message: "",
     };
   },
-  mounted() {
-    if (this.$auth.$state.loggedIn) {
-      window.location.href = "/";
-    } else {
-      if (this.$route.path !== "/login") {
-        window.location.href = "/login";
-      }
-    }
-  },
+  mounted() {},
   methods: {
     ...mapMutations(["SET_IS_AUTH", "SET_USER_DATA"]),
     async login() {
