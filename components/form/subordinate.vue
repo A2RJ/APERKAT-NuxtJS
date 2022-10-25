@@ -585,6 +585,7 @@
           </b-form-group>
 
           <b-form-group
+            v-show="button"
             label-cols="4"
             label-cols-lg="2"
             label-size="sm"
@@ -592,13 +593,14 @@
             label-for="rab"
             :class="{ 'form-group--error': $v.file.$error }"
           >
-            <!-- v-model="file" -->
             <b-button
-              variant="outline-success btn-sm mr-2"
+              variant="outline-success btn-sm mr-2 mb-2"
               @click="toggleUploadRAB()"
               >Upload file RAB</b-button
             >
-            <b-button variant="outline-success btn-sm" @click="toggleInputRAB()"
+            <b-button
+              variant="outline-success btn-sm mb-2"
+              @click="toggleInputRAB()"
               >Input RAB manual</b-button
             >
           </b-form-group>
@@ -631,90 +633,92 @@
             </b-button>
           </div>
 
-          <b-table
-            v-if="inputRAB"
-            striped
-            small
-            responsive
-            hover
-            :items="itemsHeader"
-            :fields="fields"
-            v-show="button"
-          >
-            <template #cell(jenis_barang)>
-              <b-form-textarea
-                id="nama_barang"
-                v-model="nama_barang"
-                max-rows="8"
-                required
-              ></b-form-textarea>
-            </template>
-            <template #cell(harga_satuan)>
-              <b-form-textarea
-                @keyup="numberFormatHargaSatuan"
-                id="satuan"
-                v-model="harga_satuan"
-                max-rows="8"
-                required
-              ></b-form-textarea>
-            </template>
-            <template #cell(qty)>
-              <b-form-textarea
-                id="qty"
-                v-model="qty"
-                max-rows="8"
-                required
-              ></b-form-textarea>
-            </template>
-            <template #cell(total)>
-              {{ (qty * harga_satuan.replaceAll(".", "")) | currency }}
-            </template>
-            <template #cell(keterangan)>
-              <b-form-textarea
-                id="qty"
-                v-model="ket"
-                max-rows="8"
-                placeholder="Opsional"
-                required
-              ></b-form-textarea>
-            </template>
-            <template #cell(action)>
-              <button
-                type="button"
-                class="btn btn-sm btn-outline-success"
-                @click="addRAB()"
-              >
-                Tambah
-              </button>
-            </template>
-          </b-table>
+          <div v-if="inputRAB" class="mb-5 custom-style">
+            <b-table
+              striped
+              small
+              responsive
+              hover
+              :items="itemsHeader"
+              :fields="fields"
+              v-show="button"
+            >
+              <template #cell(jenis_barang)>
+                <b-form-textarea
+                  id="nama_barang"
+                  v-model="nama_barang"
+                  max-rows="8"
+                  required
+                ></b-form-textarea>
+              </template>
+              <template #cell(harga_satuan)>
+                <b-form-textarea
+                  @keyup="numberFormatHargaSatuan"
+                  id="satuan"
+                  v-model="harga_satuan"
+                  max-rows="8"
+                  required
+                ></b-form-textarea>
+              </template>
+              <template #cell(qty)>
+                <b-form-textarea
+                  id="qty"
+                  v-model="qty"
+                  max-rows="8"
+                  required
+                ></b-form-textarea>
+              </template>
+              <template #cell(total)>
+                {{ (qty * harga_satuan.replaceAll(".", "")) | currency }}
+              </template>
+              <template #cell(keterangan)>
+                <b-form-textarea
+                  id="qty"
+                  v-model="ket"
+                  max-rows="8"
+                  placeholder="Opsional"
+                  required
+                ></b-form-textarea>
+              </template>
+              <template #cell(action)>
+                <button
+                  type="button"
+                  class="btn btn-sm btn-outline-success"
+                  @click="addRAB()"
+                >
+                  Tambah
+                </button>
+              </template>
+            </b-table>
+          </div>
 
-          <b-table
-            v-if="items.length > 0"
-            striped
-            small
-            responsive
-            hover
-            :items="items"
-            :fields="fields"
-          >
-            <template #cell(harga_satuan)="data">
-              Rp. {{ data.item.harga_satuan | currency }}
-            </template>
-            <template #cell(total)="data">
-              Rp. {{ data.item.total | currency }}
-            </template>
-            <template #cell(action)="data">
-              <button
-                type="button"
-                class="btn btn-sm btn-outline-danger"
-                v-show="button"
-                @click="hapus(data.item.no)"
-              >
-                Hapus
-              </button>
-            </template>
-          </b-table>
+          <div v-if="items.length > 0">
+            <b-table
+              striped
+              small
+              responsive
+              hover
+              :items="items"
+              :fields="fields"
+            >
+              <template #cell(harga_satuan)="data">
+                Rp. {{ data.item.harga_satuan | currency }}
+              </template>
+              <template #cell(total)="data">
+                Rp. {{ data.item.total | currency }}
+              </template>
+              <template #cell(action)="data">
+                <button
+                  type="button"
+                  class="btn btn-sm btn-outline-danger"
+                  v-show="button"
+                  @click="hapus(data.item.no)"
+                >
+                  Hapus
+                </button>
+              </template>
+            </b-table>
+          </div>
 
           <button
             class="btn btn-sm btn-primary float-right"
@@ -1725,6 +1729,10 @@ export default {
 </script>
 
 <style>
+.custom-style > * {
+  display: block !important;
+}
+
 /* Timeline */
 .container-timeline {
   position: relative;

@@ -36,7 +36,6 @@
 <script>
 import Sidebar from "@/components/Sidebar.vue";
 import Topbar from "@/components/Topbar.vue";
-import Footer from "@/components/Footer.vue";
 import { mapState, mapMutations } from "vuex";
 
 export default {
@@ -56,7 +55,6 @@ export default {
   components: {
     Sidebar: Sidebar,
     Topbar: Topbar,
-    Footer: Footer,
   },
   mounted() {
     !(function (t) {
