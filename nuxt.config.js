@@ -1,5 +1,5 @@
 // const url = process.env.IS_DEV ? process.env.DEV_URL : process.env.PROD_URL;
-const isDev = false;
+const isDev = true;
 const url = isDev ? "http://127.0.0.1:8000" : "https://aperkat.uts.ac.id/api";
 
 export default {
@@ -39,6 +39,7 @@ export default {
     "@/plugins/axios.js",
     "@/plugins/numeral.js",
     "@/plugins/vuelidate.js",
+    "@/plugins/notification.js",
     "@/plugins/custom-middleware.js",
     { src: "~/plugins/chart.js", mode: "client" },
     // "@nuxtjs/proxy",
