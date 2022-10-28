@@ -1195,9 +1195,10 @@ export default {
 
         try {
           if (this.$route.name === "pengajuan-subordinate-edit-id") {
+            const id = this.$route.params.id;
             const data = Object.assign(
               {
-                id: this.$route.params.id,
+                id,
                 status_validasi: 1,
                 message: "Update pengajuan",
                 id_struktur: this.form.id_user,
@@ -1205,8 +1206,9 @@ export default {
               },
               this.form
             );
-            await this.$axios.post(`/pengajuan/${this.$route.params.id}`, data);
-            await this.postRAB(this.$route.params.id);
+            await this.$axios.post(`/pengajuan/${id}`, data);
+            await this.postRAB(id);
+            await this.$sendNotification(id);
             this.success("Data telah disimpan!");
             window.location.reload();
           } else {
@@ -1220,8 +1222,11 @@ export default {
               },
               this.form
             );
-            const res = await this.$axios.post("/pengajuan", data);
-            await this.postRAB(res.data.id_pengajuan);
+            const {
+              data: { id_pengajuan: id },
+            } = await this.$axios.post("/pengajuan", data);
+            await this.postRAB(id);
+            await this.$sendNotification(id);
             this.success("Data telah disimpan!");
             this.$router.push(this.redirects);
           }
@@ -1294,6 +1299,7 @@ export default {
                   : this.$store.state.auth.user[0].fullname,
               next: this.terimaLPJ && this.userLogin == 121 ? 21 : this.next,
             });
+            await this.$sendNotification(this.$route.params.id);
             this.success("Berhasil terima pengajuan");
             this.option = false;
             this.$nuxt.refresh();
@@ -1333,6 +1339,7 @@ export default {
               `/pengajuan/decline/${this.$route.params.id}`,
               data
             );
+            await this.$sendNotification(this.$route.params.id);
             this.success("Berhasil tolak pengajuan");
             this.option = false;
             this.$nuxt.refresh();
@@ -1363,6 +1370,7 @@ export default {
                 images: this.buktiTFImage,
               };
               await this.$axios.post(`/pencairan`, data);
+              await this.$sendNotification(this.$route.params.id);
               this.success("Berhasil upload bukti pencairan");
               window.location.reload();
             } else {
@@ -1407,6 +1415,7 @@ export default {
               pencairan: "default.jpg",
             };
             await this.approved(data);
+            await this.$sendNotification(this.$route.params.id);
             this.success("Upload bukti pencairan selesai");
             this.formPencairan = false;
             this.$nuxt.refresh();
@@ -1438,6 +1447,7 @@ export default {
                 id_struktur: this.userLogin,
                 nama_status: this.$store.state.auth.user[0].fullname,
               });
+              await this.$sendNotification(this.$route.params.id);
               this.success("Data telah disimpan!");
               this.$nuxt.refresh();
             } else {
@@ -1475,6 +1485,7 @@ export default {
                 id_struktur: this.userLogin,
                 nama_status: this.$store.state.auth.user[0].fullname,
               });
+              await this.$sendNotification(this.$route.params.id);
               this.success("Data telah disimpan!");
               this.$nuxt.refresh();
             } else {
@@ -1512,6 +1523,7 @@ export default {
                 id_struktur: this.userLogin,
                 nama_status: this.$store.state.auth.user[0].fullname,
               });
+              await this.$sendNotification(this.$route.params.id);
               this.success("Data telah disimpan!");
               this.$nuxt.refresh();
             } else {

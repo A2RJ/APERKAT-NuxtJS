@@ -873,39 +873,34 @@ export default {
         });
       }
     },
-    addToList(params) {
-      if (this.selectedPeriod && params.biaya_disetujui) {
-        this.$axios
-          .post(`/period/addList`, {
-            id_pengajuan: params.id_pengajuan,
-            id_period: this.selectedPeriod,
-            message: "List pencairan",
-            status_validasi: 2,
-            id_struktur: 24,
-            nama_status: "Direktorat Keuangan",
-            next: 23,
-          })
-          .then((res) => {
-            if (res.data) {
-              let period = this.itemsneed.filter(
-                (i) => i.id_pengajuan !== params.id_pengajuan
-              );
-              this.itemsneed = period;
-              this.getItemForListPencairan();
-              this.selectPeriod();
-            }
-          })
-          .catch((e) => {
-            console.log(e);
-            this.failed("Whoops...");
-          });
-      } else {
-        this.failed("Select period dan input biaya disetujui");
+
+    async addToList(params) {
+      try {
+        if (!this.selectedPeriod && !params.biaya_disetujui)
+          throw new Error("Pilih periode lalu input biaya disetujui");
+        await this.$axios.post(`/period/addList`, {
+          id_pengajuan: params.id_pengajuan,
+          id_period: this.selectedPeriod,
+          message: "List pencairan",
+          status_validasi: 2,
+          id_struktur: 24,
+          nama_status: "Direktorat Keuangan",
+          next: 23,
+        });
+        await this.$sendNotification(params.id_pengajuan);
+        let period = this.itemsneed.filter(
+          (i) => i.id_pengajuan !== params.id_pengajuan
+        );
+        this.itemsneed = period;
+        this.getItemForListPencairan();
+        this.selectPeriod();
+      } catch (error) {
+        this.failed(error);
       }
     },
-    deleteFromList(params) {
-      this.$axios
-        .post(`/period/addList`, {
+    async deleteFromList(params) {
+      try {
+        await this.$axios.post(`/period/addList`, {
           id_pengajuan: params,
           id_period: null,
           message: "List pencairan (Pending)",
@@ -913,16 +908,13 @@ export default {
           id_struktur: 24,
           nama_status: "Direktorat Keuangan",
           next: 24,
-        })
-        .then((res) => {
-          if (res.data) {
-            this.getNeedApproved();
-            this.selectPeriod();
-          }
-        })
-        .catch((e) => {
-          this.failed("Whoops...");
         });
+        await this.$sendNotification(params);
+        this.getNeedApproved();
+        this.selectPeriod();
+      } catch (error) {
+        this.failed(error);
+      }
     },
     approveAll() {
       this.$swal({
@@ -936,36 +928,34 @@ export default {
         confirmButtonText: "OK",
       }).then(async (result) => {
         if (result.isConfirmed) {
-          this.loader("loading...");
-          let next = this.userLoin;
-          if (this.userLogin == 23) {
-            next = 22;
-          }
-          if (this.userLogin == 22) {
-            next = 24;
-          }
+          try {
+            this.loader("loading...");
+            let next = this.userLoin;
+            if (this.userLogin == 23) {
+              next = 22;
+            }
+            if (this.userLogin == 22) {
+              next = 24;
+            }
 
-          for (
-            let index = 0;
-            index < this.listPeriodePencairan.length;
-            index++
-          ) {
-            await this.approved({
-              id: this.listPeriodePencairan[index].id_pengajuan,
-              message: this.message,
-              status_validasi: 2,
-              id_struktur: this.userLogin,
-              nama_status: this.$store.state.auth.user[0].fullname,
-              next: next,
-            })
-              .then(() => {
-                this.$nuxt.refresh();
-              })
-              .catch(() => {
-                this.failed("Whoops Server Error");
+            const length = this.listPeriodePencairan.length;
+            for (let index = 0; index < length; index++) {
+              const id = this.listPeriodePencairan[index].id_pengajuan;
+              await this.approved({
+                id,
+                message: this.message,
+                status_validasi: 2,
+                id_struktur: this.userLogin,
+                nama_status: this.$store.state.auth.user[0].fullname,
+                next: next,
               });
+              await this.$sendNotification(id);
+            }
+            this.success("Berhasil terima pengajuan");
+            this.$nuxt.refresh();
+          } catch (error) {
+            this.failed("Gagal terima beberapa pengajuan, coba refresh");
           }
-          this.success("Berhasil terima pengajuan");
         }
       });
     },
@@ -1064,7 +1054,7 @@ export default {
         this.belumLPJKegiatan = response.data.data;
       });
     },
-    aprroveLPJKegiatan(params) {
+    aprroveLPJKegiatan(id) {
       this.$swal({
         title: "Warning!",
         text: "Terima LPJ Kegiatan ?",
@@ -1083,7 +1073,7 @@ export default {
         if (result.isConfirmed) {
           this.loader("loading...");
           this.approved({
-            id: params,
+            id,
             message: result.value,
             status_validasi: 4,
             id_struktur: 21,
@@ -1091,6 +1081,7 @@ export default {
             next: 3333,
           })
             .then(async () => {
+              await this.$sendNotification(id);
               this.success("Berhasil terima pengajuan");
               this.$nuxt.refresh();
             })
@@ -1100,7 +1091,7 @@ export default {
         }
       });
     },
-    declineLPJKegiatan(params) {
+    declineLPJKegiatan(id) {
       this.$swal({
         title: "Warning!",
         text: "Tolak LPJ Kegiatan ?",
@@ -1119,7 +1110,7 @@ export default {
         if (result.isConfirmed) {
           this.loader("loading...");
           this.approved({
-            id: params,
+            id,
             message: result.value,
             status_validasi: 0,
             id_struktur: 21,
@@ -1127,6 +1118,7 @@ export default {
             next: 21,
           })
             .then(async () => {
+              await this.$sendNotification(id);
               this.success("Berhasil tolak pengajuan");
               this.$nuxt.refresh();
             })
