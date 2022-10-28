@@ -31,18 +31,18 @@ export default {
     }),
   },
   mounted() {
-    this.send();
+    // this.send();
   },
   methods: {
     ...mapActions("subordinate", ["getGrafik"]),
-    async send() {
-      try {
-        const data = await this.$sendNotification();
-        console.log(data);
-      } catch (error) {
-        console.log(error);
-      }
-    },
+    // async send() {
+    //   try {
+    //     const data = await this.$sendNotification();
+    //     console.log(data);
+    //   } catch (error) {
+    //     console.log(error);
+    //   }
+    // },
   },
 };
 </script>

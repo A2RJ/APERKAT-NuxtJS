@@ -1330,7 +1330,7 @@ export default {
               next: this.userLogin,
             };
             await this.$axios.post(
-              `/pengajuan/${this.$route.params.id}/decline`,
+              `/pengajuan/decline/${this.$route.params.id}`,
               data
             );
             this.success("Berhasil tolak pengajuan");

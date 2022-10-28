@@ -142,6 +142,7 @@
               >Contact your cs</span
             >
           </p>
+          <!-- <button @click="showAlert">Hello world</button> -->
         </div>
       </div>
     </div>
@@ -185,6 +186,30 @@ export default {
         }
       }
     },
+    // showAlert() {
+    //   // Use sweetalert2
+    //   // this.$swal("Hello Vue world!!!")
+    //   // this.$swal({
+    //   //   width: 300,
+    //   //   icon: "success",
+    //   //   title: "Congrats!",
+    //   //   text: "Berhasil",
+    //   // });
+    //   this.$swal({
+    //     title: "Do you want to save the changes?",
+    //     showDenyButton: true,
+    //     showCancelButton: true,
+    //     confirmButtonText: "Save",
+    //     denyButtonText: `Don't save`,
+    //   }).then((result) => {
+    //     /* Read more about isConfirmed, isDenied below */
+    //     if (result.isConfirmed) {
+    //       this.$swal("Saved!", "", "success");
+    //     } else if (result.isDenied) {
+    //       this.$swal("Changes are not saved", "", "info");
+    //     }
+    //   });
+    // },
   },
 };
 </script>
