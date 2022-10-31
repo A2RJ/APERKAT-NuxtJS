@@ -887,7 +887,7 @@ export default {
           nama_status: "Direktorat Keuangan",
           next: 23,
         });
-        await this.$sendNotification(params.id_pengajuan);
+        // await this.$sendNotification(params.id_pengajuan);
         let period = this.itemsneed.filter(
           (i) => i.id_pengajuan !== params.id_pengajuan
         );
@@ -909,7 +909,7 @@ export default {
           nama_status: "Direktorat Keuangan",
           next: 24,
         });
-        await this.$sendNotification(params);
+        // await this.$sendNotification(params);
         this.getNeedApproved();
         this.selectPeriod();
       } catch (error) {
@@ -949,7 +949,7 @@ export default {
                 nama_status: this.$store.state.auth.user[0].fullname,
                 next: next,
               });
-              await this.$sendNotification(id);
+              // await this.$sendNotification(id);
             }
             this.success("Berhasil terima pengajuan");
             this.$nuxt.refresh();
@@ -1081,7 +1081,7 @@ export default {
             next: 3333,
           })
             .then(async () => {
-              await this.$sendNotification(id);
+              // await this.$sendNotification(id);
               this.success("Berhasil terima pengajuan");
               this.$nuxt.refresh();
             })
@@ -1118,7 +1118,7 @@ export default {
             next: 21,
           })
             .then(async () => {
-              await this.$sendNotification(id);
+              // await this.$sendNotification(id);
               this.success("Berhasil tolak pengajuan");
               this.$nuxt.refresh();
             })

@@ -501,7 +501,7 @@ export default {
                 images: this.buktiTFImage,
               };
               await this.$axios.post(`/pencairan`, data);
-              await this.$sendNotification(this.selectedID);
+              // await this.$sendNotification(this.selectedID);
               this.success("Berhasil upload bukti pencairan");
               this.$refs["modal"].hide();
               window.location.reload();
@@ -554,7 +554,7 @@ export default {
               nama_status: "Direktur Keuangan",
               pencairan: "default.jpg",
             });
-            await this.$sendNotification(this.selectedID);
+            // await this.$sendNotification(this.selectedID);
             this.success("Upload bukti pencairan selesai");
             this.$refs["modal"].hide();
             window.location.reload();
@@ -597,7 +597,7 @@ export default {
               next: 21,
             };
             await this.approved(data);
-            await this.$sendNotification(id);
+            // await this.$sendNotification(id);
             await this.autoLpjKegiatan(id);
             this.success("Berhasil terima pengajuan");
             this.lpjKeuangan();
@@ -636,7 +636,7 @@ export default {
               next: 24,
             };
             await this.approved(data);
-            await this.$sendNotification(id);
+            // await this.$sendNotification(id);
             this.success("Berhasil tolak pengajuan");
             this.lpjKeuangan();
             this.getBelumLPJKeuangan();
