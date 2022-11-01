@@ -68,7 +68,7 @@
             <NuxtLink
               class="collapse-item"
               :to="'/pengajuan/subordinate/'"
-              v-if="prodi || dirKeuangan"
+              v-if="prodi || dirKeuangan || dspma"
               >Pengajuan</NuxtLink
             >
             <NuxtLink
@@ -138,6 +138,7 @@ export default {
       userLogin: this.$store.state.auth.loggedIn
         ? this.$store.state.auth.user[0].id_user
         : [],
+      dspma: false,
     };
   },
   computed: {},
@@ -168,6 +169,10 @@ export default {
       }
       if (this.userLogin == 121) {
         this.notUser = false;
+      }
+
+      if (this.userLogin == 76) {
+        this.dspma = true;
       }
     }
   },

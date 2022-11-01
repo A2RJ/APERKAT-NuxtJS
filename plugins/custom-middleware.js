@@ -16,6 +16,12 @@ export default ({ app, route, store }, inject) => {
     return role.includes(store.state.auth.user[1].level);
   });
 
+  inject("isUser", (id) => {
+    if (!id) throw new Error("Role is required");
+    const userId = app.$user().id_user;
+    return id === userId ? true : false;
+  });
+
   inject("route", () => {
     return route.path;
   });
@@ -40,7 +46,8 @@ export default ({ app, route, store }, inject) => {
       user.role === "rektor" ||
       user.role === "sekniv" ||
       user.role === "warek2" ||
-      user.role === "dirKeuangan"
+      user.role === "dirKeuangan" ||
+      app.$isUser(76)
     ) {
       return true;
     } else {

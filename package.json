@@ -13,6 +13,7 @@
   "dependencies": {
     "@nuxtjs/auth-next": "5.0.0-1616003482.75c20e6",
     "@nuxtjs/axios": "5.13.1",
+    "@tawk.to/tawk-messenger-vue-2": "^1.0.3",
     "axios": "^0.21.1",
     "bootstrap-vue": "^2.23.1",
     "chart.js": "^2.9.4",
