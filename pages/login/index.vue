@@ -16,7 +16,7 @@
       >
         <img
           class="position-absolute img-fluid centered-content-3-5"
-          src="http://api.elements.buildwithangga.com/storage/files/2/assets/Empty%20State/EmptyState3/Empty-3-5.png"
+          src="https://api.elements.buildwithangga.com/storage/files/2/assets/Empty%20State/EmptyState3/Empty-3-5.png"
           alt=""
         />
       </div>
@@ -29,7 +29,7 @@
           >
             <img
               class="img-fluid"
-              src="http://api.elements.buildwithangga.com/storage/files/2/assets/Empty%20State/EmptyState3/Empty-3-5.png"
+              src="https://api.elements.buildwithangga.com/storage/files/2/assets/Empty%20State/EmptyState3/Empty-3-5.png"
               alt=""
             />
           </div>
