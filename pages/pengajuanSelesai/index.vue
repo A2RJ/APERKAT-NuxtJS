@@ -109,6 +109,7 @@
               class="btn btn-sm btn-outline-info"
               :to="'pengajuan/subordinate/edit/' + row.item.id_pengajuan"
               :key="'edit' + row.index"
+              target="_blank"
               >Detail</NuxtLink
             >
             <NuxtLink
@@ -116,6 +117,7 @@
               class="btn btn-sm btn-outline-info"
               :to="'pengajuan/supervisor/edit/' + row.item.id_pengajuan"
               :key="'edit' + row.index"
+              target="_blank"
               >Detail</NuxtLink
             >
           </template>
@@ -147,7 +149,7 @@ export default {
       filter1: null,
       filter2: null,
       fields: [
-        { key: "index", label: "No."},
+        { key: "index", label: "No." },
         { key: "fullname", label: "User" },
         { key: "nama_struktur", label: "Pelaksana" },
         { key: "validasi_status", label: "Status Pengajuan" },

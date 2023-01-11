@@ -18,7 +18,10 @@
         </template>
         <!-- actions -->
         <template #cell(actions)="data">
-          <NuxtLink :to="'/pengajuan/supervisor/summary/' + data.item.id">
+          <NuxtLink
+            :to="'/pengajuan/supervisor/summary/' + data.item.id"
+            target="_blank"
+          >
             Detail
           </NuxtLink>
         </template>

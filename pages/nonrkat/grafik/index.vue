@@ -5,20 +5,17 @@
       <div class="card shadow mb-4">
         <!-- Card Header - Dropdown -->
         <div
-          class="
-            card-header
-            py-3
-            d-flex
-            flex-row
-            align-items-center
-            justify-content-between
-          "
+          class="card-header py-3 d-flex flex-row align-items-center justify-content-between"
         >
           <h6 class="m-0 font-weight-bold text-primary">Grafik Pengajuan</h6>
         </div>
         <!-- Card Body -->
         <div class="card-body">
-          <custom-table :items="items" :fields="fields" :html="key" :actions="actions"
+          <custom-table
+            :items="items"
+            :fields="fields"
+            :html="key"
+            :actions="actions"
           >
             <template v-slot:nama_struktur="row">
               <p
@@ -52,7 +49,7 @@
                 {{ row.item.nama_struktur_child1 }}
               </p>
             </template>
-             <template v-slot:created_at="row">
+            <template v-slot:created_at="row">
               <p>{{ row.item.created_at | convertDate }}</p>
             </template>
             <template v-slot:actions="row">
@@ -60,6 +57,7 @@
                 class="btn btn-sm btn-outline-info"
                 :to="'grafik/' + row.item.id_user"
                 :key="'edit' + row.index"
+                target="_blank"
                 >Detail</NuxtLink
               >
             </template>
@@ -118,5 +116,4 @@ export default {
 };
 </script>
 
-<style>
-</style>
+<style></style>
