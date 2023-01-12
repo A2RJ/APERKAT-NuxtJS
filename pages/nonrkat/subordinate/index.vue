@@ -5,14 +5,7 @@
       <div class="card shadow mb-4">
         <!-- Card Header - Dropdown -->
         <div
-          class="
-            card-header
-            py-3
-            d-flex
-            flex-row
-            align-items-center
-            justify-content-between
-          "
+          class="card-header py-3 d-flex flex-row align-items-center justify-content-between"
         >
           <h6 class="m-0 font-weight-bold text-primary">Pengajuan non RKAT</h6>
         </div>
@@ -25,7 +18,7 @@
             :actions="actions"
             ref="table"
           >
-             <template v-slot:fullname="row">
+            <template v-slot:fullname="row">
               <p>
                 {{ row.item.fullname | capitalize }} <br />
                 <b-badge v-if="row.item.validasi_status == 0" variant="danger"
@@ -88,6 +81,7 @@
                 class="btn btn-sm btn-outline-info mt-1"
                 :to="'edit/' + row.item.id_nonrkat"
                 :key="'edit' + row.index"
+                target="_blank"
                 >Detail</NuxtLink
               >
               <button
@@ -315,5 +309,4 @@ export default {
 };
 </script>
 
-<style>
-</style>
+<style></style>

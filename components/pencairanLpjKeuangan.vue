@@ -119,6 +119,7 @@
                 class="btn btn-sm btn-outline-info"
                 :to="'/pengajuan/supervisor/edit/' + row.item.id_pengajuan"
                 :key="'edit' + row.index"
+                target="_blank"
                 >Detail</NuxtLink
               >
             </template>
@@ -164,6 +165,7 @@
                 class="btn btn-sm btn-outline-info"
                 :to="'/pengajuan/supervisor/edit/' + row.item.id_pengajuan"
                 :key="'edit' + row.index"
+                target="_blank"
                 >Detail</NuxtLink
               >
             </template>
@@ -221,6 +223,7 @@
                 class="btn btn-sm btn-outline-info"
                 :to="'/pengajuan/supervisor/edit/' + row.item.id_pengajuan"
                 :key="'edit' + row.index"
+                target="_blank"
                 >Detail</NuxtLink
               >
             </template>
@@ -290,6 +293,7 @@
                 class="btn btn-sm btn-outline-info"
                 :to="'/pengajuan/supervisor/edit/' + row.item.id_pengajuan"
                 :key="'edit' + row.index"
+                target="_blank"
                 >Detail</NuxtLink
               >
             </template>
@@ -345,6 +349,7 @@
                 class="btn btn-sm btn-outline-info"
                 :to="'/pengajuan/supervisor/edit/' + row.item.id_pengajuan"
                 :key="'edit' + row.index"
+                target="_blank"
                 >Detail</NuxtLink
               >
             </template>

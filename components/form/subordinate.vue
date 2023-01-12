@@ -38,11 +38,6 @@
           >
             Download template laporan keuangan
           </button>
-          <a href="https://www.ilovepdf.com/compress_pdf" target="_blank">
-            <button class="btn btn-sm btn-outline-warning m-1 mr-2">
-              Kompres ukuran file
-            </button>
-          </a>
           <button class="btn btn-sm btn-outline-success m-1" @click="print">
             Print pengajuan
           </button>
@@ -102,8 +97,9 @@
                 label-for="LPJKeuangan"
               >
                 <b-form-file
-                  v-model="filekeuangan"
-                  :state="Boolean(filekeuangan)"
+                  id="LPJKeuangan"
+                  v-model="LPJKeuangan"
+                  :state="Boolean(LPJKeuangan)"
                   placeholder="Choose or drop it here..."
                   drop-placeholder="Drop file here..."
                   accept=".pdf"
@@ -126,11 +122,12 @@
                 label-for="LPJKegiatan"
               >
                 <b-form-file
-                  v-model="filekegiatan"
-                  :state="Boolean(filekegiatan)"
-                  accept=".pdf"
-                  placeholder="Choose a file or drop it here..."
+                  id="LPJKegiatan"
+                  v-model="LPJKegiatan"
+                  :state="Boolean(LPJKegiatan)"
+                  placeholder="Choose or drop it here..."
                   drop-placeholder="Drop file here..."
+                  accept=".pdf"
                 ></b-form-file>
               </b-form-group>
               <button
@@ -155,6 +152,9 @@
                   placeholder="Choose a file or drop it here..."
                   drop-placeholder="Drop file here..."
                 ></b-form-file>
+                <div class="mt-3">
+                  Selected file: {{ file1 ? file1.name : "" }}
+                </div>
               </b-form-group>
               <button
                 class="btn btn-sm btn-outline-success float-right"
@@ -181,10 +181,10 @@
               ></b-form-input>
               <div class="float-right">
                 <button class="btn btn-sm btn-outline-danger" @click="tolak">
-                  Tolak <span v-show="terimaLPJ">LPJ</span>
+                  Tolak
                 </button>
                 <button class="btn btn-sm btn-outline-success" @click="terima">
-                  Terima <span v-show="terimaLPJ">LPJ</span>
+                  Terima
                 </button>
               </div>
             </b-form-group>
@@ -596,6 +596,7 @@
 
           <div v-if="uploadRAB" class="mb-5">
             <b-form-file
+              id="rab"
               v-model.trim="$v.file.$model"
               :state="Boolean(file)"
               placeholder="Choose or drop it here..."
@@ -849,28 +850,18 @@ export default {
       file: [],
       rab: false,
       message: "",
-      formPencairan: false,
       pencairan: null,
-      pencairanStatus: false,
       formLPJKeuangan: false,
       formLPJKegiatan: false,
-      filekeuangan: [],
-      filekegiatan: [],
+      LPJKeuangan: [],
+      LPJKegiatan: [],
       LPJNewFormat: [],
       formLPJ1Format: false,
-      view: {
-        pencairan: false,
-        keuangan: false,
-        kegiatan: false,
-      },
       number: null,
       next: null,
-      terimaLPJ: null,
       pencairanImg: [],
-      buktiTFImage: null,
       pencairanNominal: null,
       userLogin: this.$store.state.auth.user[0].id_user,
-      // rab
       nama_barang: "",
       harga_satuan: "",
       qty: "",
@@ -992,86 +983,42 @@ export default {
       "getIkuChild2",
       "getstatus",
     ]),
+    checkStatus(data, userId) {
+      const user = data.find((i) => i.id_user == userId && i.status == false);
+      const indx = data.findIndex((i) => i.id_user == userId);
+      const prev = data[indx - 1].status != false;
+      const next = data[indx + 1].id_user != 1111;
+      return user && prev && next;
+    },
     load() {
       if (this.$route.params.id) {
+        this.button = false;
+        this.option = false;
+        const status = this.status.data;
+        this.option = this.checkStatus(status, this.userLogin);
         if (!this.status.isNewFormat) {
-          this.button = false;
-          this.option = false;
-          // console.log(this.status.data[index - 1].status ); // untuk mengecek pengajuan sebelumnya
-          // jika user login == atasan && status belum diterima && status sebelumnya diterima maka option true
-          for (let index = 1; index < this.status.data.length; index++) {
-            if (
-              this.status.data[index].id_user == this.userLogin &&
-              this.status.data[index].status == false &&
-              this.status.data[index - 1].status !== false &&
-              this.status.data[index + 1].id_user !== 1111
-            ) {
-              this.option = true;
-            }
-          }
-          // jika dir keuangan maka upload pencairan
           if (
-            // this.userLogin == 24 && // ubah kesini jika keuangan yg lakukan pencairan
-            this.userLogin == 120 &&
-            this.status.data[this.status.data.length - 4].status &&
-            this.status.data[this.status.data.length - 3].status == false
-          ) {
-            this.form.lpj_keuangan && this.form.lpj_kegiatan
-              ? (this.formPencairan = false)
-              : ((this.formPencairan = true), (this.option = false));
-          }
-          // jika user login == pengaju && sudah pencairan maka formLPJ true
-          if (
-            this.status.data[0].id_user == this.userLogin &&
-            this.status.data[this.status.data.length - 3].status &&
-            this.status.data[this.status.data.length - 2].lpj[0].status == false
+            status[0].id_user == this.userLogin &&
+            status[status.length - 3].status &&
+            status[status.length - 2].lpj[0].status == false
           ) {
             this.formLPJKeuangan = true;
             this.option = false;
           }
           if (
-            this.status.data[0].id_user == this.userLogin &&
-            this.status.data[this.status.data.length - 3].status &&
-            this.status.data[this.status.data.length - 2].lpj[0].status &&
-            this.status.data[this.status.data.length - 2].lpj[1].status == false
+            status[0].id_user == this.userLogin &&
+            status[status.length - 3].status &&
+            status[status.length - 2].lpj[0].status &&
+            status[status.length - 2].lpj[1].status == false
           ) {
             this.formLPJKegiatan = true;
             this.option = false;
           }
-          // jika sekniv/dir keuangan maka tampilkan form terima/tolak lpj
-          if (
-            // (this.userLogin == 24 && // ubah kesini jika keuangan yg lakukan pencairan
-            (this.userLogin == 121 &&
-              this.forms.lpj_keuangan &&
-              this.status.data[this.status.data.length - 2].lpj[0].status ==
-                false) ||
-            (this.userLogin == 21 &&
-              this.forms.lpj_kegiatan &&
-              this.status.data[this.status.data.length - 2].lpj[1].status ==
-                false)
-          ) {
-            this.terimaLPJ = 4;
-            this.option = true;
-          }
         } else {
-          this.button = false;
-          this.option = false;
-
-          this.status.data.forEach((item, index) => {
-            if (
-              item.id_user == this.userLogin &&
-              item.status == false &&
-              this.status.data[index - 1].status !== false &&
-              this.status.data[index + 1].id_user !== 1111
-            ) {
-              this.option = true;
-            }
-          });
-
           if (
-            this.status.data[0].id_user == this.userLogin &&
-            this.status.data[this.status.data.length - 3].status &&
-            this.status.data[this.status.data.length - 2].status == false
+            status[0].id_user == this.userLogin &&
+            status[status.length - 3].status &&
+            status[status.length - 2].status == false
           ) {
             this.formLPJ1Format = true;
             this.option = false;
@@ -1084,23 +1031,16 @@ export default {
         }
 
         if (
-          this.status.data[0].id_user == this.userLogin &&
+          status[0].id_user == this.userLogin &&
           this.$route.name == "pengajuan-subordinate-edit-id"
         ) {
           this.$axios
             .get(`/pengajuan/validasi/${this.$route.params.id}`)
             .then((res) => {
-              if (res.data) {
-                this.button = true;
-              } else {
-                this.button = false;
-              }
+              res.data ? (this.button = true) : (this.button = false);
             });
         }
       }
-    },
-    replace() {
-      // this.form.biaya_program = this.form.biaya_program.replaceAll(".", "");
     },
     downloadFile() {
       window.open(
@@ -1179,14 +1119,11 @@ export default {
         this.failed("Pastikan semua fields diisi!");
       } else {
         this.loader("Saving pengajuan");
-        this.replace();
-
         try {
           if (this.$route.name === "pengajuan-subordinate-edit-id") {
-            const id = this.$route.params.id;
             const data = Object.assign(
               {
-                id,
+                id: this.$route.params.id,
                 status_validasi: 1,
                 message: "Update pengajuan",
                 id_struktur: this.form.id_user,
@@ -1194,27 +1131,22 @@ export default {
               },
               this.form
             );
-            await this.$axios.post(`/pengajuan/${id}`, data);
-            await this.postRAB(id);
-            // await this.$sendNotification(id);
+            await this.$axios.post(`/pengajuan/${this.$route.params.id}`, data);
+            await this.postRAB(this.$route.params.id);
             this.success("Data telah disimpan!");
             window.location.reload();
           } else {
-            const data = Object.assign(
-              {
-                id_struktur: this.userLogin,
-                status_validasi: 1,
-                message: "Input pengajuan",
-                nama_status: this.$store.state.auth.user[0].fullname,
-                next: null,
-              },
-              this.form
-            );
-            const {
-              data: { id_pengajuan: id },
-            } = await this.$axios.post("/pengajuan", data);
-            await this.postRAB(id);
-            // await this.$sendNotification(id);
+            const data = {
+              ...this.form,
+              id_struktur: this.userLogin,
+              status_validasi: 1,
+              message: "Input pengajuan",
+              nama_status: this.$store.state.auth.user[0].fullname,
+              next: null,
+            };
+
+            const res = await this.$axios.post("/pengajuan", data);
+            await this.postRAB(res.data.id_pengajuan);
             this.success("Data telah disimpan!");
             this.$router.push(this.redirects);
           }
@@ -1235,17 +1167,18 @@ export default {
       }
     },
     async terima() {
-      this.$swal({
-        title: "Warning!",
-        text: "Setujui pengajuan ini?",
-        icon: "warning",
-        width: 300,
-        showCancelButton: true,
-        confirmButtonColor: "#d33",
-        cancelButtonColor: "#3085d6",
-        confirmButtonText: "OK",
-      }).then(async (result) => {
-        if (result.isConfirmed) {
+      try {
+        this.$swal({
+          title: "Warning!",
+          text: "Setujui pengajuan ini?",
+          icon: "warning",
+          width: 300,
+          showCancelButton: true,
+          confirmButtonColor: "#d33",
+          cancelButtonColor: "#3085d6",
+          confirmButtonText: "OK",
+        }).then(async (result) => {
+          if (!result.isConfirmed) throw new Error("User cancelled the action");
           for (let index = 1; index < this.status.data.length; index++) {
             if (
               this.status.data[index].id_user == this.userLogin &&
@@ -1254,181 +1187,80 @@ export default {
               this.next = this.status.data[index + 1].id_user;
             }
           }
-          if (this.terimaLPJ == 4) {
-            if (
-              this.status.data[this.status.data.length - 2].lpj[0].status ==
-                false &&
-              this.status.data[this.status.data.length - 2].lpj[1].status ==
-                false
-            ) {
-              this.next = 21;
-            } else if (
-              this.status.data[this.status.data.length - 2].lpj[0].status !==
-                false &&
-              this.status.data[this.status.data.length - 2].lpj[1].status ==
-                false
-            ) {
-              this.next = 3333;
-            }
-          }
-          try {
-            this.loader("loading...");
-            this.replace();
-            await this.approved({
-              id: this.$route.params.id,
-              message: this.message,
-              status_validasi: this.terimaLPJ ? this.terimaLPJ : 2,
-              id_user: this.form.id_user,
-              id_struktur:
-                this.terimaLPJ && this.userLogin == 121 ? 24 : this.userLogin,
-              nama_status:
-                this.terimaLPJ && this.userLogin == 121
-                  ? "Direktur Keuangan"
-                  : this.$store.state.auth.user[0].fullname,
-              next: this.terimaLPJ && this.userLogin == 121 ? 21 : this.next,
-            });
-            // await this.$sendNotification(this.$route.params.id);
-            this.success("Berhasil terima pengajuan");
-            this.option = false;
-            this.$nuxt.refresh();
-            if (this.form.lpj_keuangan && this.form.lpj_kegiatan)
-              this.formLPJKeuangan = false;
+          this.loader("loading...");
+          await this.approved({
+            id: this.$route.params.id,
+            message: this.message,
+            status_validasi: 2,
+            id_user: this.form.id_user,
+            id_struktur: this.userLogin,
+            nama_status: this.$store.state.auth.user[0].fullname,
+            next: this.next,
+          });
+          this.success("Berhasil terima pengajuan");
+          this.option = false;
+          this.$nuxt.refresh();
+          if (this.form.lpj_keuangan && this.form.lpj_kegiatan) {
+            this.formLPJKeuangan = false;
             this.formLPJKegiatan = false;
-          } catch (error) {
-            this.failed("Whoops! gagal aksi terima pengajuan");
           }
-        }
-      });
-    },
-    async tolak() {
-      this.$swal({
-        title: "Warning!",
-        text: "Tolak pengajuan ini?",
-        icon: "warning",
-        width: 300,
-        showCancelButton: true,
-        confirmButtonColor: "#d33",
-        cancelButtonColor: "#3085d6",
-        confirmButtonText: "OK",
-      }).then(async (result) => {
-        if (result.isConfirmed) {
-          try {
-            this.loader("loading...");
-            this.replace();
-            const data = {
-              id: this.$route.params.id,
-              message: this.message,
-              status_validasi: 0,
-              id_struktur: this.userLogin,
-              nama_status: this.$store.state.auth.user[0].fullname,
-              next: this.userLogin,
-            };
-            await this.$axios.post(
-              `/pengajuan/decline/${this.$route.params.id}`,
-              data
-            );
-            // await this.$sendNotification(this.$route.params.id);
-            this.success("Berhasil tolak pengajuan");
-            this.option = false;
-            this.$nuxt.refresh();
-            if (this.form.lpj_keuangan && this.form.lpj_kegiatan)
-              this.formLPJKeuangan = false;
-            this.formLPJKegiatan = false;
-          } catch (error) {
-            this.failed("Whoops! gagal aksi revisi pengajuan");
-          }
-        }
-      });
-    },
-    // Fungsi upload file pencairan
-    async buktiTF() {
-      if (!this.pencairan && !this.pencairanNominal) {
-        const status = this.checkFileSize(this.pencairan.size);
-        if (status) {
-          try {
-            this.loader("loading...");
-            const form = new FormData();
-            form.append("file", this.pencairan);
-            const res = await this.$axios.post("/pengajuan/upload", form);
-            if (res.data) {
-              this.buktiTFImage = res.data;
-              const data = {
-                pengajuan_id: this.$route.params.id,
-                nominal: this.pencairanNominal.replaceAll(".", ""),
-                images: this.buktiTFImage,
-              };
-              await this.$axios.post(`/pencairan`, data);
-              // await this.$sendNotification(this.$route.params.id);
-              this.success("Berhasil upload bukti pencairan");
-              window.location.reload();
-            } else {
-              this.failed("Whoops! gagal upload bukti pencairan");
-            }
-          } catch (e) {
-            console.log("Whoops! gagal upload bukti pencairan");
-          }
-        } else {
-          this.failed("Ukuran file terlalu besar");
-        }
-      } else {
-        this.failed("Pilih file dan input nominal");
+        });
+      } catch (error) {
+        this.failed(`Gagal aksi terima pengajuan : ${error.message}`);
       }
     },
-    pencairanStatusChange() {
-      this.pencairanStatus = true;
-    },
-    // Aksi upload file pencairan selesai
-    async selesaiUpload() {
-      this.$swal({
-        title: "Warning!",
-        text: "Upload bukti pencairan selesai?",
-        icon: "warning",
-        width: 300,
-        showCancelButton: true,
-        confirmButtonColor: "#d33",
-        cancelButtonColor: "#3085d6",
-        confirmButtonText: "OK",
-      }).then(async (result) => {
-        if (result.isConfirmed) {
-          try {
-            this.loader("loading...");
-            this.replace();
-            const data = {
-              id: this.$route.params.id,
-              message: "Pencairan selesai",
-              status_validasi: 3,
-              id_struktur: 24,
-              next: 24,
-              nama_status: "Direktur Keuangan",
-              pencairan: "default.jpg",
-            };
-            await this.approved(data);
-            // await this.$sendNotification(this.$route.params.id);
-            this.success("Upload bukti pencairan selesai");
-            this.formPencairan = false;
-            this.$nuxt.refresh();
-          } catch (error) {
-            this.failed("Gagal upload bukti pencairan");
+    async tolak() {
+      try {
+        this.$swal({
+          title: "Warning!",
+          text: "Tolak pengajuan ini?",
+          icon: "warning",
+          width: 300,
+          showCancelButton: true,
+          confirmButtonColor: "#d33",
+          cancelButtonColor: "#3085d6",
+          confirmButtonText: "OK",
+        }).then(async (result) => {
+          if (!result.isConfirmed) throw new Error("User cancelled the action");
+          this.loader("loading...");
+          const data = {
+            id: this.$route.params.id,
+            message: this.message,
+            status_validasi: 0,
+            id_struktur: this.userLogin,
+            nama_status: this.$store.state.auth.user[0].fullname,
+            next: this.userLogin,
+          };
+          await this.$axios.post(
+            `/pengajuan/${this.$route.params.id}/decline`,
+            data
+          );
+          this.success("Berhasil tolak pengajuan");
+          this.option = false;
+          this.$nuxt.refresh();
+          if (this.form.lpj_keuangan && this.form.lpj_kegiatan) {
+            this.formLPJKeuangan = false;
+            this.formLPJKegiatan = false;
           }
-        }
-      });
+        });
+      } catch (error) {
+        this.failed(`Gagal aksi revisi pengajuan : ${error.message}`);
+      }
     },
     async uploadLPJNewFormat() {
       try {
-        if (this.file1.length === 0) throw new Error("Upload file");
-        const form = new FormData();
-        form.append("file", this.file1);
+        if (this.file1.length === 0) throw new Error("Select file");
         let status = this.checkFileSize(this.file1.size);
         if (!status) throw new Error("Ukuran file terlalu besar");
+
+        const form = new FormData();
+        form.append("file", this.file1);
+
         this.loader("Uploading...");
-        const { data } = await this.$axios.post("/pengajuan/upload", form, {
-          headers: {
-            "Content-Type": `multipart/form-data;`,
-          },
-        });
-        if (!data) throw new Error("Whoops! gagal upload LPJ");
-        this.form.lpj_keuangan = data;
-        this.replace();
+        const res = await this.$axios.post("/pengajuan/upload", form);
+        if (!res.data) throw new Error("Gagal upload LPJ");
+
+        this.form.lpj_keuangan = res.data;
         await this.updatepengajuan({
           next: 24,
           status_validasi: 1,
@@ -1438,29 +1270,27 @@ export default {
           id_struktur: this.userLogin,
           nama_status: this.$store.state.auth.user[0].fullname,
         });
-        // await this.$sendNotification(this.$route.params.id);
         this.success("Data telah disimpan!");
         this.$nuxt.refresh();
-      } catch (e) {
-        this.failed(e);
+      } catch (error) {
+        this.failed(error.message);
       }
     },
     async uploadLPJKeuangan() {
       try {
-        if (this.filekeuangan.length === 0) throw new Error("Upload file");
+        if (this.LPJKeuangan.length == 0) throw new Error("Select file");
+
         const form = new FormData();
-        form.append("file", this.filekeuangan);
-        let status = this.checkFileSize(this.filekeuangan.size);
+        form.append("file", this.LPJKeuangan);
+
+        let status = this.checkFileSize(this.LPJKeuangan.size);
         if (!status) throw new Error("Ukuran file terlalu besar");
+
         this.loader("Uploading...");
-        const { data } = await this.$axios.post("/pengajuan/upload", form, {
-          headers: {
-            "Content-Type": `multipart/form-data;`,
-          },
-        });
-        if (!data) throw new Error("Gagal upload LPJ keuangan");
-        this.form.lpj_keuangan = data;
-        this.replace();
+        const res = await this.$axios.post("/pengajuan/upload", form);
+        if (!res.data) throw new Error("Whoops! gagal upload LPJ keuangan");
+
+        this.form.lpj_keuangan = res.data;
         await this.updatepengajuan({
           next: 24,
           status_validasi: 1,
@@ -1470,31 +1300,26 @@ export default {
           id_struktur: this.userLogin,
           nama_status: this.$store.state.auth.user[0].fullname,
         });
-        // await this.$sendNotification(this.$route.params.id);
         this.success("Data telah disimpan!");
         this.$nuxt.refresh();
-      } catch (e) {
-        console.log(e, "e");
-        this.failed(e);
+      } catch (error) {
+        this.failed(error.message);
       }
     },
     async uploadLPJKegiatan() {
       try {
-        if (this.filekegiatan.length === 0) throw new Error("Pilih file");
+        if (this.LPJKegiatan.length == 0)
+          throw new Error("Pilih file LPJ Kegiatan");
         const form = new FormData();
-        form.append("file", this.filekegiatan);
-        let status = this.checkFileSize(this.filekegiatan.size);
+        form.append("file", this.LPJKegiatan);
+
+        let status = this.checkFileSize(this.LPJKegiatan.size);
         if (!status) throw new Error("Ukuran file terlalu besar");
+
         this.loader("Uploading...");
-        console.log(this.filekegiatan);
-        const { data } = await this.$axios.post("/pengajuan/upload", form, {
-          headers: {
-            "Content-Type": `multipart/form-data;`,
-          },
-        });
-        if (!data) throw new Error("Whoops! gagal upload LPJ kegiatan");
-        this.form.lpj_kegiatan = data;
-        this.replace();
+        const res = await this.$axios.post("/pengajuan/upload", form);
+        if (!res.data) throw new Error("Whoops! gagal upload LPJ kegiatan");
+        this.form.lpj_kegiatan = res.data;
         await this.updatepengajuan({
           next: 21,
           status_validasi: 1,
@@ -1504,58 +1329,26 @@ export default {
           id_struktur: this.userLogin,
           nama_status: this.$store.state.auth.user[0].fullname,
         });
-        // await this.$sendNotification(this.$route.params.id);
         this.success("Data telah disimpan!");
         this.$nuxt.refresh();
-      } catch (e) {
-        this.failed(e);
+      } catch (error) {
+        this.failed(error.message);
       }
-    },
-    async undo() {
-      this.$swal({
-        title: "Warning!",
-        text: "Tolak pengajuan ini?",
-        icon: "warning",
-        width: 300,
-        showCancelButton: true,
-        confirmButtonColor: "#d33",
-        cancelButtonColor: "#3085d6",
-        confirmButtonText: "OK",
-      }).then(async (result) => {
-        if (result.isConfirmed) {
-          try {
-            this.loader("loading...");
-            this.replace();
-            await this.declined({
-              id: this.$route.params.id,
-              message: this.message,
-              status_validasi: 0,
-              id_struktur: this.userLogin,
-              nama_status: this.$store.state.auth.user[0].fullname,
-              next: this.userLogin,
-            });
-            this.success("Berhasil tolak pengajuan");
-            this.option = true;
-            this.$nuxt.refresh();
-            if (this.form.lpj_keuangan && this.form.lpj_kegiatan) {
-              this.formLPJKeuangan = false;
-              this.formLPJKegiatan = false;
-            }
-          } catch (error) {
-            this.failed("Whoops! gagal undo aksi");
-          }
-        }
-      });
     },
     checkFileSize(size) {
       let result = true;
-      if (size > 5242880) result = false;
+      if (size > 2097152) {
+        this.failed("Ukuran file max 2MB");
+        result = false;
+      }
       return result;
     },
     async print() {
       try {
-        const url = "/pengajuan/pdfByUSer/" + this.userLogin;
-        await this.$axios.post(url, this.$route.params.id);
+        await this.$axios.post(
+          "/pengajuan/pdfByUSer/" + this.userLogin,
+          this.$route.params.id
+        );
         window.open("https://aperkat.uts.ac.id/api/g/" + btoa(this.userLogin));
       } catch (error) {
         this.failed("Whoops! gagal unduh dokumen");
@@ -1574,14 +1367,10 @@ export default {
       }
     },
     async upload() {
-      const form = new FormData();
-      form.append("file", this.file);
       try {
-        const res = await this.$axios.post("/pengajuan/importRAB", form, {
-          headers: {
-            "Content-Type": `multipart/form-data;`,
-          },
-        });
+        const form = new FormData();
+        form.append("file", this.file);
+        const res = await this.$axios.post("/pengajuan/importRAB", form);
         res.data.data.forEach((element) => {
           this.push({
             no: element.no,
@@ -1752,7 +1541,7 @@ export default {
   left: -21px;
   top: 0;
   content: " ";
-  background-image: url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iaXNvLTg4NTktMSI/Pg0KPCEtLSBHZW5lcmF0b3I6IEFkb2JlIElsbHVzdHJhdG9yIDE5LjAuMCwgU1ZHIEV4cG9ydCBQbHVnLUluIC4gU1ZHIFZlcnNpb246IDYuMDAgQnVpbGQgMCkgIC0tPg0KPHN2ZyB2ZXJzaW9uPSIxLjEiIGlkPSJMYXllcl8xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB4PSIwcHgiIHk9IjBweCINCgkgdmlld0JveD0iMCAwIDUwNy4yIDUwNy4yIiBzdHlsZT0iZW5hYmxlLWJhY2tncm91bmQ6bmV3IDAgMCA1MDcuMiA1MDcuMjsiIHhtbDpzcGFjZT0icHJlc2VydmUiPg0KPGNpcmNsZSBzdHlsZT0iZmlsbDojMzJCQTdDOyIgY3g9IjI1My42IiBjeT0iMjUzLjYiIHI9IjI1My42Ii8+DQo8cGF0aCBzdHlsZT0iZmlsbDojMEFBMDZFOyIgZD0iTTE4OC44LDM2OGwxMzAuNCwxMzAuNGMxMDgtMjguOCwxODgtMTI3LjIsMTg4LTI0NC44YzAtMi40LDAtNC44LDAtNy4yTDQwNC44LDE1MkwxODguOCwzNjh6Ii8+DQo8Zz4NCgk8cGF0aCBzdHlsZT0iZmlsbDojRkZGRkZGOyIgZD0iTTI2MCwzMTAuNGMxMS4yLDExLjIsMTEuMiwzMC40LDAsNDEuNmwtMjMuMiwyMy4yYy0xMS4yLDExLjItMzAuNCwxMS4yLTQxLjYsMEw5My42LDI3Mi44DQoJCWMtMTEuMi0xMS4yLTExLjItMzAuNCwwLTQxLjZsMjMuMi0yMy4yYzExLjItMTEuMiwzMC40LTExLjIsNDEuNiwwTDI2MCwzMTAuNHoiLz4NCgk8cGF0aCBzdHlsZT0iZmlsbDojRkZGRkZGOyIgZD0iTTM0OC44LDEzMy42YzExLjItMTEuMiwzMC40LTExLjIsNDEuNiwwbDIzLjIsMjMuMmMxMS4yLDExLjIsMTEuMiwzMC40LDAsNDEuNmwtMTc2LDE3NS4yDQoJCWMtMTEuMiwxMS4yLTMwLjQsMTEuMi00MS42LDBsLTIzLjItMjMuMmMtMTEuMi0xMS4yLTExLjItMzAuNCwwLTQxLjZMMzQ4LjgsMTMzLjZ6Ii8+DQo8L2c+DQo8Zz4NCjwvZz4NCjxnPg0KPC9nPg0KPGc+DQo8L2c+DQo8Zz4NCjwvZz4NCjxnPg0KPC9nPg0KPGc+DQo8L2c+DQo8Zz4NCjwvZz4NCjxnPg0KPC9nPg0KPGc+DQo8L2c+DQo8Zz4NCjwvZz4NCjxnPg0KPC9nPg0KPGc+DQo8L2c+DQo8Zz4NCjwvZz4NCjxnPg0KPC9nPg0KPGc+DQo8L2c+DQo8L3N2Zz4NCg==");
+  background-image: url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iaXNvLTg4NTktMSI/Pg0KPCEtLSBHZW5lcmF0b3I6IEFkb2JlIElsbHVzdHJhdG9yIDE5LjAuMCwgU1ZHIEV4cG9ydCBQbHVnLUluIC4gU1ZHIFZlcnNpb246IDYuMDAgQnVpbGQgMCkgIC0tPg0KPHN2ZyB2ZXJzaW9uPSIxLjEiIGlkPSJMYXllcl8xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTDNEpUTHQoQUJMHLrErGJyHg89uy71MyuHNCgkgdmlld0JveD0iMCAwIDUwNy4yIDUwNy4yIiBzdHlsZT0iZW5hYmxlLWJhY2tncm91bmQ6bmV3IDAgMCA1MDcuMiA1MDcuMjsiIHhtbDpzcGFjZT0icHJlc2VydmUiPg0KPGNpcmNsZSBzdHlsZT0iZmlsbDojMzJCQTdDOyIgY3g9IjI1My42IiBjeT0iMjUzLjYiIHI9IjI1My42Ii8+DQo8cGF0aCBzdHlsZT0iZmlsbDojMEFBMDZFOyIgZD0iTDNEpUTHQoQUJMHLrErGJyHg89uy71MyuHgtMjguOCwxODgtMTI3LjIsMTg4LTI0NC44YzAtMi40LDAtNC44LDAtNy4yTDQwNC44LDE1MkwxODguOCwzNjh6Ii8+DQo8Zz4NCgk8cGF0aCBzdHlsZT0iZmlsbDojRkZGRkZGOyIgZD0iTDNEpUTHQoQUJMHLrErGJyHg89uy71MyuHwzMC40LDAsNDEuNmwtMjMuMiwyMy4yYy0xMS4yLDExLjItMzAuNCwxMS4yLTDNEpUTHQoQUJMHLrErGJyHg89uy71MyuHuMi0xMS4yLTExLjItMzAuNCwwLTQxLjZsMjMuMi0yMy4yYzExLjItMTEuMiwzMC40LTDNEpUTHQoQUJMHLrErGJyHg89uy71MyuHNCgk8cGF0aCBzdHlsZT0iZmlsbDojRkZGRkZGOyIgZD0iTTM0OC44LDEzMy42YzExLjItMTEuMiwzMC40LTDNEpUTHQoQUJMHLrErGJyHg89uy71MyuHyLDExLjIsMTEuMiwzMC40LDAsNDEuNmwtMTDNEpUTHQoQUJMHLrErGJyHg89uy71MyuHwLjQsMTEuMi00MS42LDBsLTIzLjItMjMuMmMtMTEuMi0xMS4yLTDNEpUTHQoQUJMHLrErGJyHg89uy71MyuHzLjZ6Ii8+DQo8L2c+DQo8Zz4NCjwvZz4NCjxnPg0KPC9nPg0KPGc+DQo8L2c+DQo8Zz4NCjwvZz4NCjxnPg0KPC9nPg0KPGc+DQo8L2c+DQo8Zz4NCjwvZz4NCjxnPg0KPC9nPg0KPGc+DQo8L2c+DQo8Zz4NCjwvZz4NCjxnPg0KPC9nPg0KPGc+DQo8L2c+DQo8Zz4NCjwvZz4NCjxnPg0KPC9nPg0KPGc+DQo8L2c+DQo8L3N2Zz4NCg==");
 }
 
 .decline::before {
@@ -1766,7 +1555,7 @@ export default {
   left: -21px;
   top: 0;
   content: " ";
-  background-image: url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iaXNvLTg4NTktMSI/Pg0KPCEtLSBHZW5lcmF0b3I6IEFkb2JlIElsbHVzdHJhdG9yIDE5LjAuMCwgU1ZHIEV4cG9ydCBQbHVnLUluIC4gU1ZHIFZlcnNpb246IDYuMDAgQnVpbGQgMCkgIC0tPg0KPHN2ZyB2ZXJzaW9uPSIxLjEiIGlkPSJMYXllcl8xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB4PSIwcHgiIHk9IjBweCINCgkgdmlld0JveD0iMCAwIDUxMiA1MTIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDUxMiA1MTI7IiB4bWw6c3BhY2U9InByZXNlcnZlIj4NCjxlbGxpcHNlIHN0eWxlPSJmaWxsOiNFMjFCMUI7IiBjeD0iMjU2IiBjeT0iMjU2IiByeD0iMjU2IiByeT0iMjU1LjgzMiIvPg0KPGc+DQoJDQoJCTxyZWN0IHg9IjIyOC4wMjEiIHk9IjExMy4xNDMiIHRyYW5zZm9ybT0ibWF0cml4KDAuNzA3MSAtMC43MDcxIDAuNzA3MSAwLjcwNzEgLTEwNi4wMTc4IDI1Ni4wMDUxKSIgc3R5bGU9ImZpbGw6I0ZGRkZGRjsiIHdpZHRoPSI1NS45OTEiIGhlaWdodD0iMjg1LjY2OSIvPg0KCQ0KCQk8cmVjdCB4PSIxMTMuMTY0IiB5PSIyMjcuOTY4IiB0cmFuc2Zvcm09Im1hdHJpeCgwLjcwNzEgLTAuNzA3MSAwLjcwNzEgMC43MDcxIC0xMDYuMDEzNCAyNTUuOTg4NSkiIHN0eWxlPSJmaWxsOiNGRkZGRkY7IiB3aWR0aD0iMjg1LjY2OSIgaGVpZ2h0PSI1NS45OTEiLz4NCjwvZz4NCjxnPg0KPC9nPg0KPGc+DQo8L2c+DQo8Zz4NCjwvZz4NCjxnPg0KPC9nPg0KPGc+DQo8L2c+DQo8Zz4NCjwvZz4NCjxnPg0KPC9nPg0KPGc+DQo8L2c+DQo8Zz4NCjwvZz4NCjxnPg0KPC9nPg0KPGc+DQo8L2c+DQo8Zz4NCjwvZz4NCjxnPg0KPC9nPg0KPGc+DQo8L2c+DQo8Zz4NCjwvZz4NCjwvc3ZnPg0K");
+  background-image: url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iaXNvLTg4NTktMSI/Pg0KPCEtLSBHZW5lcmF0b3I6IEFkb2JlIElsbHVzdHJhdG9yIDE5LjAuMCwgU1ZHIEV4cG9ydCBQbHVnLUluIC4gU1ZHIFZlcnNpb246IDYuMDAgQnVpbGQgMCkgIC0tPg0KPHN2ZyB2ZXJzaW9uPSIxLjEiIGlkPSJMYXllcl8xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTDNEpUTHQoQUJMHLrErGJyHg89uy71MyuHNCgkgdmlld0JveD0iMCAwIDUxMiA1MTIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDUxMiA1MTDNEpUTHQoQUJMHLrErGJyHg89uy71MyuHNCjxlbGxpcHNlIHN0eWxlPSJmaWxsOiNFMjFCMUI7IiBjeD0iMjU2IiBjeT0iMjU2IiByeD0iMjU2IiByeT0iMjU1LjgzMiIvPg0KPGc+DQoJDQoJCTxyZWN0IHg9IjIyOC4wMjEiIHk9IjExMy4xNDMiIHRyYW5zZm9ybT0ibWF0cml4KDAuNzA3MSAtMC43MDcxIDAuNzA3MSAwLjcwNzEgLTDNEpUTHQoQUJMHLrErGJyHg89uy71MyuH9ImZpbGw6I0ZGRkZGRjsiIHdpZHRoPSI1NS45OTEiIGhlaWdodD0iMjg1LjY2OSIvPg0KCQ0KCQk8cmVjdCB4PSIxMTMuMTY0IiB5PSIyMjcuOTY4IiB0cmFuc2Zvcm09Im1hdHJpeCgwLjcwNzEgLTAuNzA3MSAwLjcwNzEgMC43MDcxIC0xMDYuMDEzNCAyNTUuOTg4NSkiIHN0eWxlPSJmaWxsOiNGRkZGRkY7IiB3aWR0aD0iMjg1LjY2OSIgaGVpZ2h0PSI1NS45OTEiLz4NCjwvZz4NCjxnPg0KPC9nPg0KPGc+DQo8L2c+DQo8Zz4NCjwvZz4NCjxnPg0KPC9nPg0KPGc+DQo8L2c+DQo8Zz4NCjwvZz4NCjxnPg0KPC9nPg0KPGc+DQo8L2c+DQo8Zz4NCjwvZz4NCjxnPg0KPC9nPg0KPGc+DQo8L2c+DQo8Zz4NCjwvZz4NCjxnPg0KPC9nPg0KPGc+DQo8L2c+DQo8Zz4NCjwvZz4NCjwvc3ZnPg0K");
 }
 
 .waiting::before {
@@ -1781,7 +1570,7 @@ export default {
   top: 0;
   content: " ";
   background: rgb(255, 255, 255);
-  background-image: url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iaXNvLTg4NTktMSI/Pgo8IS0tIEdlbmVyYXRvcjogQWRvYmUgSWxsdXN0cmF0b3IgMTkuMC4wLCBTVkcgRXhwb3J0IFBsdWctSW4gLiBTVkcgVmVyc2lvbjogNi4wMCBCdWlsZCAwKSAgLS0+CjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0iQ2FwYV8xIiB4PSIwcHgiIHk9IjBweCIgdmlld0JveD0iMCAwIDUxMiA1MTIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDUxMiA1MTI7IiB4bWw6c3BhY2U9InByZXNlcnZlIj4KPGc+Cgk8cmVjdCB4PSIyMjYiIHN0eWxlPSJmaWxsOiNBQkVDRUM7IiB3aWR0aD0iNjAiIGhlaWdodD0iMTIwIi8+CgkKCQk8cmVjdCB4PSI4Ny40MSIgeT0iNTcuNDExIiB0cmFuc2Zvcm09Im1hdHJpeCgtMC43MDcxIDAuNzA3MSAtMC43MDcxIC0wLjcwNzEgMjgzLjQ1MTUgMTE3LjQxMDYpIiBzdHlsZT0iZmlsbDojQUJFQ0VDOyIgd2lkdGg9IjU5Ljk5OSIgaGVpZ2h0PSIxMTkuOTk5Ii8+CjwvZz4KPGc+Cgk8cmVjdCB5PSIyMjYiIHN0eWxlPSJmaWxsOiM0MkM4QzY7IiB3aWR0aD0iMTIwIiBoZWlnaHQ9IjYwIi8+CgkKCQk8cmVjdCB4PSI1Ny40MDYiIHk9IjM2NC41ODQiIHRyYW5zZm9ybT0ibWF0cml4KC0wLjcwNzEgMC43MDcxIC0wLjcwNzEgLTAuNzA3MSA0NzkuNDM2MiA1OTAuNTc5KSIgc3R5bGU9ImZpbGw6IzQyQzhDNjsiIHdpZHRoPSIxMTkuOTk5IiBoZWlnaHQ9IjU5Ljk5OSIvPgo8L2c+CjxnPgoJPHJlY3QgeD0iMjI2IiB5PSIzOTIiIHN0eWxlPSJmaWxsOiMwMkFDQUI7IiB3aWR0aD0iNjAiIGhlaWdodD0iMTIwIi8+CgkKCQk8cmVjdCB4PSIzNjQuNTc5IiB5PSIzMzQuNTkxIiB0cmFuc2Zvcm09Im1hdHJpeCgtMC43MDcxIDAuNzA3MSAtMC43MDcxIC0wLjcwNzEgOTUyLjYwNiAzOTQuNTk3NykiIHN0eWxlPSJmaWxsOiMwMkFDQUI7IiB3aWR0aD0iNTkuOTk5IiBoZWlnaHQ9IjExOS45OTkiLz4KPC9nPgo8cmVjdCB4PSIzOTIiIHk9IjIyNiIgc3R5bGU9ImZpbGw6IzAyNzM3MjsiIHdpZHRoPSIxMjAiIGhlaWdodD0iNjAiLz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPC9zdmc+Cg==");
+  background-image: url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iaXNvLTg4NTktMSI/Pgo8IS0tIEdlbmVyYXRvcjogQWRvYmUgSWxsdXN0cmF0b3IgMTkuMC4wLCBTVkcgRXhwb3J0IFBsdWctSW4gLiBTDNEpUTHQoQUJMHLrErGJyHg89uy71MyuHSAgLS0+CjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0iQ2FwYV8xIiB4PSIwcHgiIHk9IjBweCIgdmlld0JveD0iMCAwIDUxMiA1MTIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDUxMiA1MTDNEpUTHQoQUJMHLrErGJyHg89uy71MyuHKPGc+Cgk8cmVjdCB4PSIyMjYiIHN0eWxlPSJmaWxsOiNBQkVDRUM7IiB3aWR0aD0iNjAiIGhlaWdodD0iMTIwIi8+CgkKCQk8cmVjdCB4PSI4Ny40MSIgeT0iNTcuNDExIiB0cmFuc2Zvcm09Im1hdHJpeCgtMC43MDcxIDAuNzA3MSAtMC43MDcxIC0wLjcwNzEgMjgzLjQ1MTUgMTE3LjQxMDYpIiBzdHlsZT0iZmlsbDojQUJFQ0VDOyIgd2lkdGg9IjU5Ljk5OSIgaGVpZ2h0PSIxMTkuOTk5Ii8+CjwvZz4KPGc+Cgk8cmVjdCB5PSIyMjYiIHN0eWxlPSJmaWxsOiM0MkM4QzY7IiB3aWR0aD0iMTIwIiBoZWlnaHQ9IjYwIi8+CgkKCQk8cmVjdCB4PSI1Ny40MDYiIHk9IjM2NC41ODQiIHRyYW5zZm9ybT0ibWF0cml4KC0wLjcwNzEgMC43MDcxIC0wLjcwNzEgLTAuNzA3MSA0NzkuNDM2MiA1OTDNEpUTHQoQUJMHLrErGJyHg89uy71MyuHDNjsiIHdpZHRoPSIxMTDNEpUTHQoQUJMHLrErGJyHg89uy71MyuH8L2c+CjxnPgoJPHJlY3QgeD0iMjI2IiB5PSIzOTIiIHN0eWxlPSJmaWxsOiMwMkFDQUI7IiB3aWR0aD0iNjAiIGhlaWdodD0iMTIwIi8+CgkKCQk8cmVjdCB4PSIzNjQuNTc5IiB5PSIzMzQuNTkxIiB0cmFuc2Zvcm09Im1hdHJpeCgtMC43MDcxIDAuNzA3MSAtMC43MDcxIC0wLjcwNzEgOTUyLjYwNiAzOTQuNTk3NykiIHN0eWxlPSJmaWxsOiMwMkFDQUI7IiB3aWR0aD0iNTDNEpUTHQoQUJMHLrErGJyHg89uy71MyuHKPC9nPgo8cmVjdCB4PSIzOTDNEpUTHQoQUJMHLrErGJyHg89uy71MyuHyNzM3MjsiIHdpZHRoPSIxMjAiIGhlaWdodD0iNjAiLz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPC9zdmc+Cg==");
 }
 
 @media (min-width: 1200px) {

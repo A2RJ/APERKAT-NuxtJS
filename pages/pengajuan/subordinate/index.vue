@@ -51,6 +51,7 @@
                 class="btn btn-sm btn-outline-info mt-1"
                 :to="'/pengajuan/subordinate/edit/' + row.item.id_pengajuan"
                 :key="'edit' + row.index"
+                target="_blank"
                 >Detail</NuxtLink
               >
               <button

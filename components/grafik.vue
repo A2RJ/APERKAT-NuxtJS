@@ -138,6 +138,7 @@
               class="btn btn-sm btn-outline-info"
               :to="'/rkat/edit/' + row.item.id_rkat"
               :key="'edit' + row.index"
+              target="_blank"
               >Detail</NuxtLink
             >
           </template>

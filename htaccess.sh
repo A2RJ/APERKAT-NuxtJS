@@ -10,3 +10,5 @@ cat > .htaccess << EOF
   RewriteRule . /index.html [L]
 </ifModule>
 EOF
+
+mv .htaccess dist/

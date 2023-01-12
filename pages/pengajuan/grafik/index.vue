@@ -100,22 +100,23 @@
                 class="btn btn-sm btn-outline-info"
                 :to="'grafik/' + row.item.id_user"
                 :key="'edit' + row.index"
+                target="_blank"
                 >Detail</NuxtLink
               >
             </template>
           </b-table>
           <b-row>
-        <b-col sm="7" md="6" class="my-1">
-          <b-pagination
-            v-model="currentPage"
-            :total-rows="totalRows"
-            :per-page="perPage"
-            align="fill"
-            size="sm"
-            class="my-0"
-          ></b-pagination>
-        </b-col>
-      </b-row>
+            <b-col sm="7" md="6" class="my-1">
+              <b-pagination
+                v-model="currentPage"
+                :total-rows="totalRows"
+                :per-page="perPage"
+                align="fill"
+                size="sm"
+                class="my-0"
+              ></b-pagination>
+            </b-col>
+          </b-row>
         </div>
       </div>
     </div>
@@ -167,7 +168,7 @@ export default {
   },
   methods: {
     ...mapActions("subordinate", ["getpengajuan"]),
-     onFiltered(filteredItems) {
+    onFiltered(filteredItems) {
       // Trigger pagination to update the number of buttons/pages due to filtering
       // this.totalRows = filteredItems.length
       // this.currentPage = 1
