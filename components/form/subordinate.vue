@@ -1037,17 +1037,10 @@ export default {
           this.$axios
             .get(`/pengajuan/validasi/${this.$route.params.id}`)
             .then((res) => {
-              if (res.data) {
-                this.button = true;
-              } else {
-                this.button = false;
-              }
+              res.data ? (this.button = true) : (this.button = false);
             });
         }
       }
-    },
-    replace() {
-      // this.form.biaya_program = this.form.biaya_program.replaceAll(".", "");
     },
     downloadFile() {
       window.open(
