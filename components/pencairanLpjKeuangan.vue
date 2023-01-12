@@ -4,7 +4,13 @@
       <b-tabs content-class="mt-3" v-if="userLogin == 120">
         <b-tab title="Belum Pencairan" active>
           <!-- hide button modals -->
-          <b-modal ref="modal" id="modal-1" :title="selectedRKAT" hide-footer>
+          <b-modal
+            v-if="selectedRKAT"
+            ref="modal"
+            id="modal-1"
+            :title="selectedRKAT"
+            hide-footer
+          >
             <div class="m-3">
               <!-- input form -->
               <b-form-group
@@ -500,6 +506,7 @@ export default {
                 images: this.buktiTFImage,
               };
               await this.$axios.post(`/pencairan`, data);
+              // await this.$sendNotification(this.selectedID);
               this.success("Berhasil upload bukti pencairan");
               this.$refs["modal"].hide();
               window.location.reload();
@@ -552,6 +559,7 @@ export default {
               nama_status: "Direktur Keuangan",
               pencairan: "default.jpg",
             });
+            // await this.$sendNotification(this.selectedID);
             this.success("Upload bukti pencairan selesai");
             this.$refs["modal"].hide();
             window.location.reload();
@@ -566,7 +574,7 @@ export default {
       this.selectedID = params;
       console.log(this.selectedRKAT, this.selectedID);
     },
-    async aprroveLPJKeuangan(params) {
+    async aprroveLPJKeuangan(id) {
       this.$swal({
         title: "Warning!",
         text: "Terima LPJ Keuangan ?",
@@ -586,7 +594,7 @@ export default {
           try {
             this.loader("loading...");
             const data = {
-              id: params,
+              id,
               message: result.value,
               status_validasi: 4,
               id_struktur: 24,
@@ -594,17 +602,18 @@ export default {
               next: 21,
             };
             await this.approved(data);
-            await this.autoLpjKegiatan(params);
+            // await this.$sendNotification(id);
+            await this.autoLpjKegiatan(id);
             this.success("Berhasil terima pengajuan");
             this.lpjKeuangan();
             this.getBelumLPJKeuangan();
           } catch (error) {
-            this.failed("Whoops Server Error");
+            this.failed("Gagal terima pengajuan");
           }
         }
       });
     },
-    async declineLPJKeuangan(params) {
+    async declineLPJKeuangan(id) {
       this.$swal({
         title: "Warning!",
         text: "Tolak LPJ Keuangan ?",
@@ -624,7 +633,7 @@ export default {
           try {
             this.loader("loading...");
             const data = {
-              id: params,
+              id,
               message: result.value,
               status_validasi: 0,
               id_struktur: 24,
@@ -632,11 +641,12 @@ export default {
               next: 24,
             };
             await this.approved(data);
+            // await this.$sendNotification(id);
             this.success("Berhasil tolak pengajuan");
             this.lpjKeuangan();
             this.getBelumLPJKeuangan();
           } catch (error) {
-            this.failed("Whoops Server Error");
+            this.failed("Gagal tolak pengajuan");
           }
         }
       });

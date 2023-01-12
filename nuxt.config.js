@@ -39,10 +39,11 @@ export default {
     "@/plugins/axios.js",
     "@/plugins/numeral.js",
     "@/plugins/vuelidate.js",
+    "@/plugins/sweetalert.js",
+    "@/plugins/notification.js",
     "@/plugins/custom-middleware.js",
     { src: "~/plugins/chart.js", mode: "client" },
-    // "@nuxtjs/proxy",
-    // {src: '~/plugins/vue-list-picker.js', mode: 'client'},
+    { src: "~/plugins/tawk-messenger.js", mode: "client" },
   ],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
@@ -56,17 +57,22 @@ export default {
     "@nuxtjs/axios",
     "@nuxtjs/auth-next",
     "bootstrap-vue/nuxt",
-    "vue-sweetalert2/nuxt",
+    // [
+    //   "nuxt-apache-config",
+    //   {
+    //     https: true,
+    //     redirection: true,
+    //     redirectUrl: "404.html",
+    //     indexes: true,
+    //     onlyGET: true,
+    //   },
+    // ],
   ],
   axios: {
     withCredentials: true,
     baseURL: url,
     browserBaseURL: url,
-    // proxy: true,
   },
-  // proxy: {
-  //   "/api/": "http://api.aperkat.uts.ac.id",
-  // },
   auth: {
     strategies: {
       laravelJWT: {
@@ -99,7 +105,7 @@ export default {
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {
-    analyze: true,
+    analyze: false,
     collapseBooleanAttributes: true,
     decodeEntities: true,
     minifyCSS: true,
