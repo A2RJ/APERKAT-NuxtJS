@@ -30,9 +30,24 @@ export default {
       grafik: (state) => state.grafik,
     }),
   },
-  mounted() {},
+  mounted() {
+    // this.send();
+  },
   methods: {
     ...mapActions("subordinate", ["getGrafik"]),
+
+    /**
+     * Buat tombol on of notifikasi whatsapp di aperkat khusus admin
+     */
+
+    // async send() {
+    //   try {
+    //     const data = await this.$sendNotification();
+    //     console.log(data);
+    //   } catch (error) {
+    //     console.log(error);
+    //   }
+    // },
   },
 };
 </script>
