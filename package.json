@@ -8,6 +8,7 @@
     "build": "nuxt build",
     "start": "nuxt start",
     "generate": "nuxt generate",
+    "deploy": "npx nuxt build && npx nuxt generate",
     "host": "nuxt --hostname '172.10.0.75' --port 8000"
   },
   "dependencies": {
