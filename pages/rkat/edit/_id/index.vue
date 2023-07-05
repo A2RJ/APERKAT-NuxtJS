@@ -24,7 +24,7 @@ import rkatform from "~/components/form/rkat.vue";
 import { mapActions, mapMutations } from "vuex";
 
 export default {
-  middleware: ["pages/rkat", "roles/sekniv"],
+  middleware: ["pages/rkat"],
   async asyncData({ store, params }) {
     await Promise.all([
       store.dispatch("rkat/getrkatID", params.id),
