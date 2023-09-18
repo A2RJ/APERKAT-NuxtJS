@@ -57,9 +57,9 @@ export default {
     Topbar: Topbar,
   },
   mounted() {
-    this.$tawkMessenger.$on("load", () => {
-      this.$tawkMessenger.toggle();
-    });
+    // this.$tawkMessenger.$on("load", () => {
+    //   this.$tawkMessenger.toggle();
+    // });
     !(function (t) {
       "use strict";
       t("#sidebarToggle, #sidebarToggleTop").on("click", function (o) {
