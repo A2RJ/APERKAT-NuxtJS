@@ -53,21 +53,7 @@ export default {
   buildModules: ["@nuxt/components"],
 
   // Modules: https://go.nuxtjs.dev/config-modules
-  modules: [
-    "@nuxtjs/axios",
-    "@nuxtjs/auth-next",
-    "bootstrap-vue/nuxt",
-    // [
-    //   "nuxt-apache-config",
-    //   {
-    //     https: true,
-    //     redirection: true,
-    //     redirectUrl: "404.html",
-    //     indexes: true,
-    //     onlyGET: true,
-    //   },
-    // ],
-  ],
+  modules: ["@nuxtjs/axios", "@nuxtjs/auth-next", "bootstrap-vue/nuxt"],
   axios: {
     withCredentials: true,
     baseURL: url,
