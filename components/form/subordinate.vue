@@ -232,7 +232,7 @@
             label-cols="4"
             label-cols-lg="2"
             label-size="sm"
-            label="Kode RKAT"
+            label="Nomor RKAT"
             label-for="kode_rkat"
             :class="{ 'form-group--error': $v.kode_rkat.$error }"
           >
@@ -251,7 +251,7 @@
             label-cols="4"
             label-cols-lg="2"
             label-size="sm"
-            label="Nama Kegiatan"
+            label="Jenis Kegiatan"
             label-for="nama_kegiatan"
           >
             <b-form-input
@@ -266,7 +266,75 @@
             label-cols="4"
             label-cols-lg="2"
             label-size="sm"
-            label="Latar belakang pelaksanaan kegiatan"
+            label="Pemateri"
+            label-for="nama_kegiatan"
+          >
+            <b-form-input
+              v-model="rkat.nama_kegiatan"
+              id="nama_kegiatan"
+              size="sm"
+              readonly
+            ></b-form-input>
+          </b-form-group>
+
+          <b-form-group
+            label-cols="4"
+            label-cols-lg="2"
+            label-size="sm"
+            label="Peserta"
+            label-for="nama_kegiatan"
+          >
+            <b-form-input
+              v-model="rkat.nama_kegiatan"
+              id="nama_kegiatan"
+              size="sm"
+              readonly
+            ></b-form-input>
+          </b-form-group>
+
+          <b-form-group
+            label-cols="4"
+            label-cols-lg="2"
+            label-size="sm"
+            label="Tempat Kegiatan"
+            label-for="nama_kegiatan"
+          >
+            <b-form-input
+              v-model="rkat.nama_kegiatan"
+              id="nama_kegiatan"
+              size="sm"
+              readonly
+            ></b-form-input>
+          </b-form-group>
+
+          <b-form-group
+            label-cols="4"
+            label-cols-lg="2"
+            label-size="sm"
+            label="Waktu Kegiatan"
+            label-for="tanggal"
+            :class="{ 'form-group--error': $v.form.tanggal.$error }"
+          >
+            <b-form-datepicker
+              id="tanggal"
+              v-model.trim="$v.form.tanggal.$model"
+              class="mb-2"
+              size="sm"
+              today-button
+              reset-button
+              close-button
+              locale="IDN"
+            ></b-form-datepicker>
+            <b-form-text id="tanggal" v-if="!$v.form.tanggal.required">
+              <i class="text-danger">Tanggal is required</i>
+            </b-form-text>
+          </b-form-group>
+
+          <b-form-group
+            label-cols="4"
+            label-cols-lg="2"
+            label-size="sm"
+            label="Latar belakang"
             label-for="latar_belakang"
             :class="{ 'form-group--error': $v.form.latar_belakang.$error }"
           >
@@ -291,57 +359,24 @@
             label-cols="4"
             label-cols-lg="2"
             label-size="sm"
-            label="Tujuan Kegiatan"
-            label-for="tujuan"
+            label="Rundown acara"
+            label-for="latar_belakang"
+            :class="{ 'form-group--error': $v.form.latar_belakang.$error }"
           >
             <b-form-textarea
-              v-model="rkat.tujuan"
+              v-model.trim="$v.form.latar_belakang.$model"
               id="textarea"
               placeholder="Enter something..."
               rows="3"
               max-rows="6"
-              readonly
-            ></b-form-textarea>
-          </b-form-group>
-
-          <b-form-group
-            label-cols="4"
-            label-cols-lg="2"
-            label-size="sm"
-            label="Sasaran"
-            label-for="sasaran"
-            :class="{ 'form-group--error': $v.form.sasaran.$error }"
-          >
-            <b-form-input
-              v-model.trim="$v.form.sasaran.$model"
-              id="sasaran"
-              size="sm"
-            ></b-form-input>
-            <b-form-text id="sasaran" v-if="!$v.form.sasaran.required">
-              <i class="text-danger">Sasaran is required</i>
-            </b-form-text>
-          </b-form-group>
-
-          <b-form-group
-            label-cols="4"
-            label-cols-lg="2"
-            label-size="sm"
-            label="Target Capaian"
-            label-for="target_capaian"
-            :class="{ 'form-group--error': $v.form.target_capaian.$error }"
-          >
-            <b-form-textarea
-              v-model.trim="$v.form.target_capaian.$model"
-              placeholder="Enter something..."
-              rows="3"
-              max-rows="6"
-              id="target_capaian"
             ></b-form-textarea>
             <b-form-text
-              id="target_capaian"
-              v-if="!$v.form.target_capaian.required"
+              id="latar_belakang"
+              v-if="!$v.form.latar_belakang.required"
             >
-              <i class="text-danger">Target capaian is required</i>
+              <i class="text-danger"
+                >Latar belakang pelaksanaan kegiatan is required</i
+              >
             </b-form-text>
           </b-form-group>
 
@@ -349,76 +384,7 @@
             label-cols="4"
             label-cols-lg="2"
             label-size="sm"
-            label="Bentuk Pelaksanaan Program"
-            label-for="bentuk_pelaksanaan_program"
-            :class="{
-              'form-group--error': $v.form.bentuk_pelaksanaan_program.$error,
-            }"
-          >
-            <b-form-input
-              v-model.trim="$v.form.bentuk_pelaksanaan_program.$model"
-              id="bentuk_pelaksanaan_program"
-              size="sm"
-            ></b-form-input>
-            <b-form-text
-              id="bentuk_pelaksanaan_program"
-              v-if="!$v.form.bentuk_pelaksanaan_program.required"
-            >
-              <i class="text-danger">Bentuk pelaksanaan program is required</i>
-            </b-form-text>
-          </b-form-group>
-
-          <b-form-group
-            label-cols="4"
-            label-cols-lg="2"
-            label-size="sm"
-            label="Tempat Program"
-            label-for="tempat_program"
-            :class="{ 'form-group--error': $v.form.tempat_program.$error }"
-          >
-            <b-form-textarea
-              v-model.trim="$v.form.tempat_program.$model"
-              placeholder="Enter something..."
-              rows="3"
-              max-rows="6"
-              id="tempat_program"
-            ></b-form-textarea>
-            <b-form-text
-              id="tempat_program"
-              v-if="!$v.form.tempat_program.required"
-            >
-              <i class="text-danger">Tempat program is required</i>
-            </b-form-text>
-          </b-form-group>
-
-          <b-form-group
-            label-cols="4"
-            label-cols-lg="2"
-            label-size="sm"
-            label="Tanggal"
-            label-for="tanggal"
-            :class="{ 'form-group--error': $v.form.tanggal.$error }"
-          >
-            <b-form-datepicker
-              id="tanggal"
-              v-model.trim="$v.form.tanggal.$model"
-              class="mb-2"
-              size="sm"
-              today-button
-              reset-button
-              close-button
-              locale="IDN"
-            ></b-form-datepicker>
-            <b-form-text id="tanggal" v-if="!$v.form.tanggal.required">
-              <i class="text-danger">Tanggal is required</i>
-            </b-form-text>
-          </b-form-group>
-
-          <b-form-group
-            label-cols="4"
-            label-cols-lg="2"
-            label-size="sm"
-            label="Bidang Terkait"
+            label="Vendor"
             label-for="bidang_terkait"
             :class="{ 'form-group--error': $v.form.bidang_terkait.$error }"
           >

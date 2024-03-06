@@ -24,8 +24,6 @@
                     label="Pelaksana"
                     label-for="id_user"
                   >
-                    <!-- :class="{ 'form-group--error': $v.selected.$error }" -->
-                    <!-- v-model.trim="$v.selected.$model" -->
                     <v-select
                       v-model="selected"
                       :options="options"
@@ -85,23 +83,31 @@
                 >
                   <tr>
                     <th>#</th>
-                    <th>Kode RKAT</th>
-                    <th>Program Kerja</th>
+                    <th>Unit Kerja</th>
+                    <th>Unit Pengaju</th>
+                    <th>Nomor PPUF</th>
+                    <th>Indikator Kinerja Utama</th>
+                    <th>Jenis Kegiatan</th>
+                    <th>Nama Program</th>
                     <th>Deskripsi</th>
-                    <th>Mulai Program</th>
-                    <th>Selesai Program</th>
-                    <th>Tempat</th>
-                    <th>Anggaran</th>
+                    <th>Tempat Pelaksanaan</th>
+                    <th>Waktu Pelaksanaan</th>
+                    <th>RAB</th>
+                    <th>Ket</th>
                   </tr>
-                  <tr v-for="item in data.data" :key="item.no">
-                    <td>{{ item.no }}</td>
-                    <td>{{ item.kode_rkat }}</td>
-                    <td>{{ item.program_kerja }}</td>
+                  <tr v-for="(item, index) in data.data" :key="index">
+                    <td>{{ index }}</td>
+                    <td>{{ item.unit_kerja }}</td>
+                    <td>{{ item.unit_pengaju }}</td>
+                    <td>{{ item.nomor_ppuf }}</td>
+                    <td>{{ item.indikator_kinerja_utama }}</td>
+                    <td>{{ item.jenis_kegiatan }}</td>
+                    <td>{{ item.nama_program }}</td>
                     <td>{{ item.deskripsi }}</td>
-                    <td>{{ item.mulai_program }}</td>
-                    <td>{{ item.selesai_program }}</td>
-                    <td>{{ item.tempat }}</td>
-                    <td>RP. {{ item.total_anggaran | currency }}</td>
+                    <td>{{ item.tempat_pelaksanaan }}</td>
+                    <td>{{ item.waktu_pelaksanaan }}</td>
+                    <td>RP. {{ item.rab | currency }}</td>
+                    <td>{{ item.keterangan }}</td>
                   </tr>
                 </table>
                 <div
@@ -239,14 +245,17 @@ export default {
         },
       ],
       fields: [
-        { key: "fullname", label: "Pelaksana" },
-        { key: "kode_rkat", label: "Kode RKAT " },
-        { key: "mulai_program", label: "Mulai Kegiatan" },
-        { key: "selesai_program", label: "Selesai Kegiatan" },
-        { key: "created_at", label: "Waktu Pengajuan" },
-        { key: "total_anggaran", label: "Total Anggaran" },
-        { key: "anggaran_digunakan", label: "Anggaran dicairkan" },
-        "total_anggaran",
+        { key: "fullname", label: "Unit Kerja" },
+        { key: "kode_rkat", label: "Unit Pengaju " },
+        { key: "mulai_program", label: "Nomor PPUF" },
+        { key: "selesai_program", label: "Indikator Kinerja Utama" },
+        { key: "created_at", label: "Jenis Kegiatan" },
+        { key: "total_anggaran", label: "Nama Program" },
+        { key: "anggaran_digunakan", label: "Deskripsi" },
+        { key: "anggaran_digunakan1", label: "Tempat Pelaksana" },
+        { key: "anggaran_digunakan2", label: "Waktu Pelaksana" },
+        "RAB",
+        "Keterangan",
         "actions",
       ],
       items: [],
@@ -435,7 +444,7 @@ export default {
         formData.append("file", this.file1);
 
         await this.$axios
-          .post("/rkat/uploadRKAT", formData, {
+          .post("/import-ppuf", formData, {
             headers: {
               "Content-Type": "multipart/form-data;",
             },

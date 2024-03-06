@@ -21,12 +21,12 @@
       </b-col>
       <b-col lg="12" class="my-1">
         <b-row>
-          <b-col lg="4" class="my-1">
+          <b-col lg="3" class="my-1">
             <b-form-group
-              label="Filter"
+              label="Filter year"
               label-for="years"
               label-cols-sm="6"
-              label-cols-md="4"
+              label-cols-md="3"
               label-cols-6
               label-align-sm="right"
               label-size="sm"
@@ -41,12 +41,32 @@
               </b-form-select>
             </b-form-group>
           </b-col>
-          <b-col lg="4" class="my-1">
+          <b-col lg="3" class="my-1">
+            <b-form-group
+              label="Filter month"
+              label-for="months"
+              label-cols-sm="6"
+              label-cols-md="3"
+              label-cols-6
+              label-align-sm="right"
+              label-size="sm"
+              class="mb-0"
+            >
+              <b-form-select
+                id="months"
+                v-model="perMonth"
+                :options="monthOptions"
+                size="sm"
+              >
+              </b-form-select>
+            </b-form-group>
+          </b-col>
+          <b-col lg="3" class="my-1">
             <b-form-group
               label="Per page"
               label-for="per-page-select"
               label-cols-sm="6"
-              label-cols-md="4"
+              label-cols-md="3"
               label-cols-6
               label-align-sm="right"
               label-size="sm"
@@ -60,7 +80,7 @@
               ></b-form-select>
             </b-form-group>
           </b-col>
-          <b-col lg="4" class="my-1">
+          <b-col lg="3" class="my-1">
             <b-form-group
               label="Search"
               label-for="filter-input"
@@ -90,9 +110,11 @@
     </b-row>
     <!-- :fixed="true" -->
     <b-table
-      :items="perYear == '' ? items : items.filter(
-        (item) => item.period.substring(0, 4) == perYear
-      )"
+      :items="
+        perYear == ''
+          ? items
+          : items.filter((item) => item.period.substring(0, 4) == perYear)
+      "
       :fields="fieldsTable"
       :select-mode="selectMode"
       :current-page="currentPage"
@@ -153,13 +175,7 @@
 import { mapActions, mapState } from "vuex";
 
 export default {
-  props: [
-    "items",
-    "fields",
-    "html",
-    "perYearFilterState",
-    "actions",
-  ],
+  props: ["items", "fields", "html", "perYearFilterState", "actions"],
   data() {
     return {
       transProps: {
@@ -177,7 +193,22 @@ export default {
       filter: null,
       countRows: 0,
       perYear: "",
+      perMonth: "januari",
       yearOption: [],
+      monthOptions: [
+        "Januari",
+        "Februari",
+        "Maret",
+        "April",
+        "Mei",
+        "Juni",
+        "Juli",
+        "Agustus",
+        "September",
+        "Oktober",
+        "November",
+        "Desember",
+      ],
     };
   },
   computed: {
