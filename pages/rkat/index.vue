@@ -10,8 +10,6 @@
         >
           <h6 class="m-0 font-weight-bold text-primary">RKAT</h6>
         </div>
-        
-        <rkat-table-pagination />
 
         <!-- Card Body -->
         <div class="card-body">

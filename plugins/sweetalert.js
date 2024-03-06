@@ -1,6 +1,6 @@
 import Vue from "vue";
 import VueSweetalert2 from "vue-sweetalert2";
-import "./../static/vendor/sweetalert/sweetalert2.css";
+import 'sweetalert2/dist/sweetalert2.min.css';
 
 const options = {
   confirmButtonColor: "#41b882",
