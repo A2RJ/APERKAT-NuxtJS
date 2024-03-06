@@ -43,7 +43,7 @@ export default {
     "@/plugins/notification.js",
     "@/plugins/custom-middleware.js",
     { src: "~/plugins/chart.js", mode: "client" },
-    { src: "~/plugins/tawk-messenger.js", mode: "client" },
+    // { src: "~/plugins/tawk-messenger.js", mode: "client" },
   ],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
